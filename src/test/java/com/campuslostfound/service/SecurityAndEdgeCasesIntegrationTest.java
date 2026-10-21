@@ -6,17 +6,12 @@ import com.campuslostfound.dao.LocationDAO;
 import com.campuslostfound.dao.UserDAO;
 import com.campuslostfound.database.DatabaseConfig;
 import com.campuslostfound.database.DatabaseConnection;
-import com.campuslostfound.dsa.MatchPriorityQueue;
 import com.campuslostfound.exception.CampusLostFoundException;
 import com.campuslostfound.exception.InvalidClaimException;
 import com.campuslostfound.model.Admin;
 import com.campuslostfound.model.AdminAnalytics;
 import com.campuslostfound.model.Claim;
-import com.campuslostfound.model.ClaimStatus;
 import com.campuslostfound.model.FoundItem;
-import com.campuslostfound.model.Item;
-import com.campuslostfound.model.ItemStatus;
-import com.campuslostfound.model.ItemType;
 import com.campuslostfound.model.LostItem;
 import com.campuslostfound.model.Match;
 import com.campuslostfound.model.User;
@@ -31,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 

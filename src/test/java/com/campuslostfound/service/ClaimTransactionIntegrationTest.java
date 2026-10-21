@@ -3,7 +3,6 @@ package com.campuslostfound.service;
 import com.campuslostfound.dao.AnalyticsDAO;
 import com.campuslostfound.dao.ClaimDAO;
 import com.campuslostfound.dao.ItemDAO;
-import com.campuslostfound.dao.LocationDAO;
 import com.campuslostfound.dao.UserDAO;
 import com.campuslostfound.database.DatabaseConnection;
 import com.campuslostfound.exception.CampusLostFoundException;
@@ -26,7 +25,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 

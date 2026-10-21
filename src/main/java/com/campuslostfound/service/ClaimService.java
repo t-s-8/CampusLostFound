@@ -7,7 +7,6 @@ import com.campuslostfound.exception.InvalidClaimException;
 import com.campuslostfound.model.Claim;
 import com.campuslostfound.model.ClaimStatus;
 import com.campuslostfound.model.Item;
-import com.campuslostfound.model.ItemStatus;
 import com.campuslostfound.model.ItemType;
 import com.campuslostfound.model.User;
 

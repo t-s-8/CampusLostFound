@@ -6,7 +6,6 @@ import com.campuslostfound.model.ItemType;
 import com.campuslostfound.model.Location;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;

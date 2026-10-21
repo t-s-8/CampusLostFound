@@ -1,0 +1,57 @@
+erDiagram
+    users {
+        int user_id PK "AUTO_INCREMENT"
+        varchar name "NOT NULL"
+        varchar email UK "NOT NULL"
+        varchar password_hash "NOT NULL (SHA-256)"
+        enum role "STUDENT, ADMIN"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+    locations {
+        int location_id PK "AUTO_INCREMENT"
+        varchar location_name "NOT NULL"
+        varchar building "NULLABLE"
+    }
+
+    items {
+        int item_id PK "AUTO_INCREMENT"
+        int user_id FK "NOT NULL -> users.user_id"
+        int location_id FK "NOT NULL -> locations.location_id"
+        varchar name "NOT NULL"
+        varchar category "NOT NULL"
+        text description "NULLABLE"
+        enum item_type "LOST, FOUND"
+        date item_date "NOT NULL"
+        enum status "ACTIVE, MATCHED, CLAIMED, RECOVERED"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+    matches {
+        int match_id PK "AUTO_INCREMENT"
+        int lost_item_id FK "NOT NULL -> items.item_id"
+        int found_item_id FK "NOT NULL -> items.item_id"
+        decimal score "CHECK: 0.00 to 100.00"
+        enum status "PENDING, NOTIFIED, CONFIRMED, DISMISSED"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+    claims {
+        int claim_id PK "AUTO_INCREMENT"
+        int item_id FK "NOT NULL -> items.item_id"
+        int user_id FK "NOT NULL -> users.user_id"
+        timestamp claim_date "DEFAULT CURRENT_TIMESTAMP"
+        enum status "PENDING, APPROVED, REJECTED"
+        text verification_details "NULLABLE"
+        int reviewed_by FK "NULLABLE -> users.user_id"
+        timestamp reviewed_at "NULLABLE"
+    }
+
+    %% Relationships and Cardinalities
+    users ||--o{ items : "reports (1:N)"
+    locations ||--o{ items : "located_at (1:N)"
+    items ||--o{ matches : "lost_item_in (1:N)"
+    items ||--o{ matches : "found_item_in (1:N)"
+    items ||--o{ claims : "subject_of (1:N)"
+    users ||--o{ claims : "files_claim (1:N)"
+    users ||--o{ claims : "reviews_claim (0..1:N)"

@@ -1,13 +1,9 @@
 package com.campuslostfound.ui;
 
 import com.campuslostfound.model.Item;
-import com.campuslostfound.model.ItemStatus;
-import com.campuslostfound.model.ItemType;
 import com.campuslostfound.model.User;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

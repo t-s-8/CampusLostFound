@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Manages in-memory item collections, providing fast indexed lookups and keyword/predicate searches.
@@ -99,10 +98,6 @@ public class ItemSearch {
         itemMap.clear();
     }
 
-    // =========================================================================
-    // SEARCH METHODS (Demonstrating Method Overloading)
-    // =========================================================================
-
     /**
      * Search Variant 1: Search by text keyword across name and description.
      * Time Complexity: O(N).
@@ -179,10 +174,6 @@ public class ItemSearch {
         }
         return filtered;
     }
-
-    // =========================================================================
-    // TYPE & STATUS FILTERING METHODS (Polymorphism & Collection Filtering)
-    // =========================================================================
 
     /**
      * Returns only reports of LOST items.

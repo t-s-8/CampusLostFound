@@ -1,7 +1,6 @@
 package com.campuslostfound.ui;
 
 import com.campuslostfound.model.Item;
-import com.campuslostfound.model.ItemType;
 import com.campuslostfound.model.Location;
 import com.campuslostfound.model.User;
 import javafx.collections.FXCollections;
@@ -16,7 +15,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
