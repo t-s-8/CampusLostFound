@@ -1,0 +1,7 @@
+# Safe example configuration template for local MySQL database.
+# Copy this file to src/main/resources/db.properties and fill in your local credentials.
+# NOTE: db.properties is ignored by Git to prevent credential leakage.
+
+db.url=jdbc:mysql://localhost:3306/campus_lost_found?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+db.user=your_mysql_username
+db.password=your_mysql_password
