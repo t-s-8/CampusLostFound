@@ -11,20 +11,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data Access Object (DAO) for analytical aggregations and reporting.
- *
- * Executes aggregated SQL queries utilizing JOIN, GROUP BY, ORDER BY,
- * and conditional summation.
- */
 public class AnalyticsDAO {
 
-    /**
-     * Computes real-time system analytics from the database.
-     */
     public AdminAnalytics fetchSystemAnalytics() {
         try (Connection conn = DatabaseConnection.getConnection()) {
-            // 1. Items count summary
             String itemsSql = "SELECT " +
                     "COUNT(*) AS total_items, " +
                     "SUM(CASE WHEN item_type = 'LOST' THEN 1 ELSE 0 END) AS total_lost, " +
@@ -52,7 +42,6 @@ public class AnalyticsDAO {
 
             double recoveryRate = totalItems > 0 ? ((double) recoveredItems * 100.0) / totalItems : 0.0;
 
-            // 2. Claims count summary
             String claimsSql = "SELECT " +
                     "SUM(CASE WHEN status = 'PENDING' THEN 1 ELSE 0 END) AS pending_claims, " +
                     "SUM(CASE WHEN status = 'APPROVED' THEN 1 ELSE 0 END) AS approved_claims, " +
@@ -72,7 +61,6 @@ public class AnalyticsDAO {
                 }
             }
 
-            // 3. Top Reported Locations (Campus Hotspots)
             String locationsSql = "SELECT " +
                     "l.location_name, " +
                     "COALESCE(l.building, '') AS building, " +
@@ -99,7 +87,6 @@ public class AnalyticsDAO {
                 }
             }
 
-            // 4. Most Common Categories & LOST vs FOUND counts
             String categoriesSql = "SELECT " +
                     "category, " +
                     "COUNT(*) AS total_reports, " +

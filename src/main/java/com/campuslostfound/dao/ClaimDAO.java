@@ -17,14 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Data Access Object (DAO) for Claim persistence operations.
- */
 public class ClaimDAO {
 
-    /**
-     * Submits a new ownership claim.
-     */
     public Claim create(Claim claim) {
         String sql = "INSERT INTO claims (item_id, user_id, claim_date, status, verification_details) " +
                 "VALUES (?, ?, ?, ?, ?)";
@@ -53,9 +47,6 @@ public class ClaimDAO {
         }
     }
 
-    /**
-     * Finds a claim by its primary key claim_id.
-     */
     public Optional<Claim> findById(int claimId) {
         String sql = "SELECT claim_id, item_id, user_id, claim_date, status, verification_details, reviewed_by, reviewed_at " +
                 "FROM claims WHERE claim_id = ?";
@@ -74,27 +65,18 @@ public class ClaimDAO {
         }
     }
 
-    /**
-     * Retrieves all claims submitted for a particular item.
-     */
     public List<Claim> findByItemId(int itemId) {
         String sql = "SELECT claim_id, item_id, user_id, claim_date, status, verification_details, reviewed_by, reviewed_at " +
                 "FROM claims WHERE item_id = ? ORDER BY claim_date DESC";
         return queryClaims(sql, itemId);
     }
 
-    /**
-     * Retrieves all claims filed by a specific student user.
-     */
     public List<Claim> findByUserId(int userId) {
         String sql = "SELECT claim_id, item_id, user_id, claim_date, status, verification_details, reviewed_by, reviewed_at " +
                 "FROM claims WHERE user_id = ? ORDER BY claim_date DESC";
         return queryClaims(sql, userId);
     }
 
-    /**
-     * Retrieves all claims awaiting administrative review (status = 'PENDING').
-     */
     public List<Claim> findPendingClaims() {
         String sql = "SELECT claim_id, item_id, user_id, claim_date, status, verification_details, reviewed_by, reviewed_at " +
                 "FROM claims WHERE status = 'PENDING' ORDER BY claim_date ASC";
@@ -112,9 +94,6 @@ public class ClaimDAO {
         }
     }
 
-    /**
-     * Retrieves all claims in the database.
-     */
     public List<Claim> findAll() {
         String sql = "SELECT claim_id, item_id, user_id, claim_date, status, verification_details, reviewed_by, reviewed_at " +
                 "FROM claims ORDER BY claim_date DESC";
@@ -132,9 +111,6 @@ public class ClaimDAO {
         }
     }
 
-    /**
-     * Updates claim review status along with reviewer ID and timestamp.
-     */
     public boolean updateStatus(int claimId, ClaimStatus status, int reviewedBy, LocalDateTime reviewedAt) {
         String sql = "UPDATE claims SET status = ?, reviewed_by = ?, reviewed_at = ? WHERE claim_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -155,34 +131,10 @@ public class ClaimDAO {
         }
     }
 
-    /**
-     * Overload for standard transactional claim approval.
-     */
     public boolean approveClaimTransaction(int claimId, int adminUserId) {
         return approveClaimTransaction(claimId, adminUserId, false);
     }
 
-    /**
-     * Executes atomic transactional claim approval within a single database transaction.
-     *
-     * Transaction Workflow:
-     * 1. Acquires row-level write locks (FOR UPDATE) on both the claim and the target item,
-     *    preventing race conditions, duplicate approvals, or conflicting modifications.
-     * 2. Validates that the claim is in PENDING status.
-     * 3. Validates that the target item is a FOUND item, is currently claimable (ACTIVE or MATCHED),
-     *    and has not already been RECOVERED.
-     * 4. Updates the claim to APPROVED with the reviewer admin ID and timestamp.
-     * 5. Updates the target item status to RECOVERED.
-     * 6. Updates any related candidate matches for this found item to CONFIRMED.
-     * 7. If the claimant previously reported a corresponding lost item, updates that lost item to RECOVERED.
-     * 8. Rejects all other competing PENDING claims for the same item.
-     * 9. Commits the transaction if all operations succeed; rolls back completely on any failure.
-     *
-     * @param claimId ID of the claim to approve.
-     * @param adminUserId ID of the reviewing administrator.
-     * @param simulateFailureForTesting If true, throws an exception after updating the claim to verify rollback.
-     * @return true if the approval transaction committed successfully.
-     */
     public boolean approveClaimTransaction(int claimId, int adminUserId, boolean simulateFailureForTesting) {
         String claimLockSql = "SELECT claim_id, item_id, user_id, status FROM claims WHERE claim_id = ? FOR UPDATE";
         String itemLockSql = "SELECT item_id, user_id, item_type, status FROM items WHERE item_id = ? FOR UPDATE";
@@ -201,7 +153,6 @@ public class ClaimDAO {
                 int itemId;
                 int claimantUserId;
 
-                // 1. Lock and validate claim state
                 try (PreparedStatement stmt = conn.prepareStatement(claimLockSql)) {
                     stmt.setInt(1, claimId);
                     try (ResultSet rs = stmt.executeQuery()) {
@@ -217,7 +168,6 @@ public class ClaimDAO {
                     }
                 }
 
-                // 2. Lock and validate item state
                 try (PreparedStatement stmt = conn.prepareStatement(itemLockSql)) {
                     stmt.setInt(1, itemId);
                     try (ResultSet rs = stmt.executeQuery()) {
@@ -243,7 +193,6 @@ public class ClaimDAO {
                     }
                 }
 
-                // 3. Update claim to APPROVED
                 try (PreparedStatement stmt = conn.prepareStatement(updateClaimSql)) {
                     stmt.setInt(1, adminUserId);
                     stmt.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
@@ -254,12 +203,10 @@ public class ClaimDAO {
                     }
                 }
 
-                // Simulated failure hook for testing transaction rollback behavior
                 if (simulateFailureForTesting) {
                     throw new SQLException("Simulated transaction failure triggered for rollback verification.");
                 }
 
-                // 4. Update item status to RECOVERED
                 try (PreparedStatement stmt = conn.prepareStatement(updateItemSql)) {
                     stmt.setInt(1, itemId);
                     int affected = stmt.executeUpdate();
@@ -268,20 +215,17 @@ public class ClaimDAO {
                     }
                 }
 
-                // 5. Update related matches to CONFIRMED
                 try (PreparedStatement stmt = conn.prepareStatement(updateMatchesSql)) {
                     stmt.setInt(1, itemId);
                     stmt.executeUpdate();
                 }
 
-                // 6. If claimant filed a matched lost report, update that lost item to RECOVERED as well
                 try (PreparedStatement stmt = conn.prepareStatement(updateMatchedLostSql)) {
                     stmt.setInt(1, itemId);
                     stmt.setInt(2, claimantUserId);
                     stmt.executeUpdate();
                 }
 
-                // 7. Reject any other competing pending claims for this item
                 try (PreparedStatement stmt = conn.prepareStatement(rejectOtherClaimsSql)) {
                     stmt.setInt(1, adminUserId);
                     stmt.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
@@ -290,7 +234,6 @@ public class ClaimDAO {
                     stmt.executeUpdate();
                 }
 
-                // 8. Commit the entire transaction
                 conn.commit();
                 return true;
             } catch (Exception e) {

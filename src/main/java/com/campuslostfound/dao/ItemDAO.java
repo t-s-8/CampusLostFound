@@ -21,15 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Data Access Object (DAO) for Item persistence operations.
- * Maps relational rows to polymorphic domain entities (LostItem / FoundItem).
- */
 public class ItemDAO {
 
-    /**
-     * Inserts a new lost or found item report.
-     */
     public Item create(Item item) {
         String sql = "INSERT INTO items (user_id, location_id, name, category, description, item_type, item_date, status, created_at) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -62,9 +55,6 @@ public class ItemDAO {
         }
     }
 
-    /**
-     * Finds an item by primary key item_id.
-     */
     public Optional<Item> findById(int itemId) {
         String sql = "SELECT item_id, user_id, location_id, name, category, description, item_type, item_date, status, created_at " +
                 "FROM items WHERE item_id = ?";
@@ -83,19 +73,12 @@ public class ItemDAO {
         }
     }
 
-    /**
-     * Retrieves all items ordered from newest report to oldest.
-     */
     public List<Item> findAll() {
         String sql = "SELECT item_id, user_id, location_id, name, category, description, item_type, item_date, status, created_at " +
                 "FROM items ORDER BY item_date DESC, item_id DESC";
         return executeQueryForList(sql);
     }
 
-    /**
-     * Retrieves items matching a specific ItemType and ItemStatus.
-     * Useful for fetching active candidates for matching.
-     */
     public List<Item> findByTypeAndStatus(ItemType type, ItemStatus status) {
         String sql = "SELECT item_id, user_id, location_id, name, category, description, item_type, item_date, status, created_at " +
                 "FROM items WHERE item_type = ? AND status = ? ORDER BY item_date DESC";
@@ -116,9 +99,6 @@ public class ItemDAO {
         }
     }
 
-    /**
-     * Retrieves all items reported by a specific user.
-     */
     public List<Item> findByUserId(int userId) {
         String sql = "SELECT item_id, user_id, location_id, name, category, description, item_type, item_date, status, created_at " +
                 "FROM items WHERE user_id = ? ORDER BY item_date DESC";
@@ -138,9 +118,6 @@ public class ItemDAO {
         }
     }
 
-    /**
-     * Updates an item's lifecycle status (e.g. ACTIVE -> MATCHED -> RECOVERED).
-     */
     public boolean updateStatus(int itemId, ItemStatus status) {
         String sql = "UPDATE items SET status = ? WHERE item_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -154,10 +131,6 @@ public class ItemDAO {
         }
     }
 
-    /**
-     * Dynamic parameterized search with optional filters.
-     * Uses PreparedStatement with dynamic parameter binding (Never string concatenation).
-     */
     public List<Item> search(String keyword, String category, Integer locationId, ItemType type, ItemStatus status) {
         StringBuilder sql = new StringBuilder("SELECT item_id, user_id, location_id, name, category, description, item_type, item_date, status, created_at FROM items WHERE 1=1");
         List<Object> params = new ArrayList<>();
@@ -221,9 +194,6 @@ public class ItemDAO {
         }
     }
 
-    /**
-     * Polymorphic mapping of a database row to LostItem or FoundItem.
-     */
     private Item mapResultSetToItem(ResultSet rs) throws SQLException {
         int id = rs.getInt("item_id");
         int userId = rs.getInt("user_id");

@@ -17,19 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Data Access Object (DAO) for User persistence operations using standard JDBC.
- *
- * Responsibilities:
- * - Executes parameterized SQL queries for user CRUD operations.
- * - Enforces resource management via try-with-resources.
- * - Safely maps ResultSets into domain models (User / Admin).
- */
 public class UserDAO {
 
-    /**
-     * Persists a new user record and sets the auto-generated primary key.
-     */
     public User create(User user) {
         String sql = "INSERT INTO users (name, email, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -57,9 +46,6 @@ public class UserDAO {
         }
     }
 
-    /**
-     * Finds a user by their unique email address.
-     */
     public Optional<User> findByEmail(String email) {
         String sql = "SELECT user_id, name, email, password_hash, role, created_at FROM users WHERE email = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -77,9 +63,6 @@ public class UserDAO {
         }
     }
 
-    /**
-     * Finds a user by their primary key user_id.
-     */
     public Optional<User> findById(int userId) {
         String sql = "SELECT user_id, name, email, password_hash, role, created_at FROM users WHERE user_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -97,9 +80,32 @@ public class UserDAO {
         }
     }
 
-    /**
-     * Retrieves all registered users.
-     */
+
+    public boolean updatePasswordHash(int userId, String passwordHash) {
+        String sql = "UPDATE users SET password_hash = ? WHERE user_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, passwordHash);
+            stmt.setInt(2, userId);
+            return stmt.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new CampusLostFoundException("Database error updating password hash.", e);
+        }
+    }
+
+
+    public boolean configureBootstrapAdmin(int userId, String passwordHash) {
+        String sql = "UPDATE users SET role = 'ADMIN', password_hash = ? WHERE user_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, passwordHash);
+            stmt.setInt(2, userId);
+            return stmt.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new CampusLostFoundException("Database error configuring bootstrap administrator.", e);
+        }
+    }
+
     public List<User> findAll() {
         String sql = "SELECT user_id, name, email, password_hash, role, created_at FROM users ORDER BY user_id";
         List<User> users = new ArrayList<>();
@@ -116,9 +122,6 @@ public class UserDAO {
         }
     }
 
-    /**
-     * Helper to map a ResultSet row into a polymorphic User (or Admin) domain entity.
-     */
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         int id = rs.getInt("user_id");
         String name = rs.getString("name");

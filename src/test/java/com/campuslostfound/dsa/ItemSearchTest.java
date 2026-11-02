@@ -63,21 +63,17 @@ class ItemSearchTest {
     @Test
     @DisplayName("ArrayList sequential scan: search by keyword across name and description")
     void testSearchByKeyword() {
-        // Keyword in name
         List<Item> dellItems = searchIndex.search("Dell");
         assertEquals(2, dellItems.size(), "Should find 2 Dell items");
 
-        // Keyword in description
         List<Item> carbonItems = searchIndex.search("carbon fiber");
         assertEquals(1, carbonItems.size());
         assertEquals(lostLaptop, carbonItems.get(0));
 
-        // Case-insensitive search
         List<Item> walletItems = searchIndex.search("wALLeT");
         assertEquals(1, walletItems.size());
         assertEquals(foundWallet, walletItems.get(0));
 
-        // Empty search returns all items
         assertEquals(4, searchIndex.search("").size());
         assertEquals(4, searchIndex.search(null).size());
     }
@@ -85,11 +81,9 @@ class ItemSearchTest {
     @Test
     @DisplayName("Overloaded search: keyword AND category")
     void testSearchByKeywordAndCategory() {
-        // "Dell" in "Electronics" -> matches 2
         List<Item> electronics = searchIndex.search("Dell", "Electronics");
         assertEquals(2, electronics.size());
 
-        // "Dell" in "Personal Belongings" -> matches 0
         List<Item> personal = searchIndex.search("Dell", "Personal Belongings");
         assertTrue(personal.isEmpty());
     }
@@ -97,11 +91,9 @@ class ItemSearchTest {
     @Test
     @DisplayName("Overloaded search: keyword, category, and location ID")
     void testSearchByKeywordCategoryAndLocation() {
-        // Dell + Electronics in Location 1 -> 2 items
         List<Item> loc1 = searchIndex.search("Dell", "Electronics", 1);
         assertEquals(2, loc1.size());
 
-        // Dell + Electronics in Location 2 -> 0 items
         List<Item> loc2 = searchIndex.search("Dell", "Electronics", 2);
         assertTrue(loc2.isEmpty());
     }
@@ -112,7 +104,6 @@ class ItemSearchTest {
         LocalDate start = LocalDate.of(2026, 10, 9);
         LocalDate end = LocalDate.of(2026, 10, 11);
 
-        // Should match items on 10th (Dell laptop and charger), but not 12th or 14th
         List<Item> items = searchIndex.search("", "Electronics", start, end);
         assertEquals(2, items.size());
 

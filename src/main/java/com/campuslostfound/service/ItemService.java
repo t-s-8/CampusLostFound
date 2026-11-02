@@ -14,9 +14,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Service managing lost and found item reports and triggering candidate matching.
- */
 public class ItemService {
 
     private final ItemDAO itemDAO;
@@ -33,74 +30,48 @@ public class ItemService {
         this.matchService = matchService;
     }
 
-    /**
-     * Reports a new lost item, saves it to the database, and initiates matching.
-     */
     public LostItem reportLostItem(int userId, int locationId, String name, String category,
                                    String description, LocalDate date) {
         validateItemAttributes(name, category, date, userId, locationId);
         LostItem lostItem = new LostItem(userId, locationId, name, category, description, date);
         Item saved = itemDAO.create(lostItem);
 
-        // Run matching against existing active found items
         coordinateMatching(saved);
 
         return (LostItem) saved;
     }
 
-    /**
-     * Reports a new found item, saves it to the database, and initiates matching.
-     */
     public FoundItem reportFoundItem(int userId, int locationId, String name, String category,
                                      String description, LocalDate date) {
         validateItemAttributes(name, category, date, userId, locationId);
         FoundItem foundItem = new FoundItem(userId, locationId, name, category, description, date);
         Item saved = itemDAO.create(foundItem);
 
-        // Run matching against existing active lost items
         coordinateMatching(saved);
 
         return (FoundItem) saved;
     }
 
-    /**
-     * Finds an item by ID.
-     */
     public Optional<Item> getItemById(int itemId) {
         return itemDAO.findById(itemId);
     }
 
-    /**
-     * Retrieves all active lost items.
-     */
     public List<Item> getActiveLostItems() {
         return itemDAO.findByTypeAndStatus(ItemType.LOST, ItemStatus.ACTIVE);
     }
 
-    /**
-     * Retrieves all active found items.
-     */
     public List<Item> getActiveFoundItems() {
         return itemDAO.findByTypeAndStatus(ItemType.FOUND, ItemStatus.ACTIVE);
     }
 
-    /**
-     * Retrieves all items reported by a specific user.
-     */
     public List<Item> getItemsByReporter(int userId) {
         return itemDAO.findByUserId(userId);
     }
 
-    /**
-     * Retrieves all items reported across the campus.
-     */
     public List<Item> getAllItems() {
         return itemDAO.findAll();
     }
 
-    /**
-     * Updates the status of an item.
-     */
     public boolean updateItemStatus(int itemId, ItemStatus status) {
         return itemDAO.updateStatus(itemId, status);
     }
@@ -110,7 +81,6 @@ public class ItemService {
             List<Match> matches = matchService.findAndRecordMatchesForItem(item);
             boolean hasHighMatch = matches.stream().anyMatch(Match::isPossibleMatch);
             if (hasHighMatch) {
-                // Update item status to MATCHED (Note: NEVER marks item RECOVERED automatically)
                 itemDAO.updateStatus(item.getItemId(), ItemStatus.MATCHED);
                 item.setStatus(ItemStatus.MATCHED);
             }

@@ -11,9 +11,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
-/**
- * Service managing user registration, authentication, password hashing, and role authorization.
- */
 public class AuthService {
 
     private final UserDAO userDAO;
@@ -26,10 +23,6 @@ public class AuthService {
         this.userDAO = userDAO;
     }
 
-    /**
-     * Registers a new student or admin user.
-     * Validates input, prevents duplicate emails, and hashes the password with SHA-256.
-     */
     public User register(String name, String email, String password, UserRole role) {
         if (name == null || name.trim().isEmpty()) {
             throw new CampusLostFoundException("Name cannot be empty.");
@@ -58,10 +51,6 @@ public class AuthService {
         return userDAO.create(newUser);
     }
 
-    /**
-     * Authenticates a user using email and plaintext password.
-     * Compares the SHA-256 digest with the stored password_hash.
-     */
     public User authenticate(String email, String password) {
         if (email == null || password == null) {
             throw new CampusLostFoundException("Email and password must not be null.");
@@ -71,18 +60,16 @@ public class AuthService {
         User user = userDAO.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new CampusLostFoundException("Invalid email or password."));
 
-        String inputHash = hashPassword(password);
-        if (!inputHash.equalsIgnoreCase(user.getPasswordHash())) {
+        boolean valid = PasswordHasher.isEncoded(user.getPasswordHash())
+                ? PasswordHasher.matches(password, user.getPasswordHash())
+                : hashPassword(password).equalsIgnoreCase(user.getPasswordHash());
+        if (!valid) {
             throw new CampusLostFoundException("Invalid email or password.");
         }
 
         return user;
     }
 
-    /**
-     * Computes a deterministic SHA-256 hexadecimal hash string.
-     * Exactly matches the MySQL native SHA2(password, 256) function used in database seeds.
-     */
     public static String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -101,9 +88,6 @@ public class AuthService {
         }
     }
 
-    /**
-     * Looks up a user by ID.
-     */
     public Optional<User> getUserById(int userId) {
         return userDAO.findById(userId);
     }

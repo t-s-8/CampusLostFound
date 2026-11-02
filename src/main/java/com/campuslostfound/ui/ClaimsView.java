@@ -26,11 +26,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Screen 7: Claims View
- * Handles ownership claim submission for found items, display of claim statuses,
- * and administrative verification/resolution.
- */
 public class ClaimsView {
 
     private final VBox root;
@@ -40,7 +35,6 @@ public class ClaimsView {
     private final TextArea proofArea;
     private final Label feedbackLabel;
 
-    // Details panel components
     private final Label detailClaimIdLbl;
     private final Label detailItemLbl;
     private final Label detailStatusLbl;
@@ -58,7 +52,6 @@ public class ClaimsView {
         root = new VBox(16);
         root.getStyleClass().add("content-container");
 
-        // 1. Informative Header Card
         VBox headerCard = new VBox(6);
         headerCard.getStyleClass().add("card");
         Label headerTitle = new Label("Item Ownership Claims");
@@ -67,11 +60,9 @@ public class ClaimsView {
         headerSub.setStyle("-fx-text-fill: #64748b; -fx-font-size: 12px;");
         headerCard.getChildren().addAll(headerTitle, headerSub);
 
-        // 2. Main Content Split: Submit Form (Left) & Claims Table / Inspector (Right)
         HBox mainLayout = new HBox(16);
         VBox.setVgrow(mainLayout, Priority.ALWAYS);
 
-        // ----------------- LEFT: Submission Form -----------------
         VBox submitCard = new VBox(12);
         submitCard.getStyleClass().add("card");
         submitCard.setPrefWidth(380);
@@ -126,7 +117,6 @@ public class ClaimsView {
                 feedbackLabel, submitBtn
         );
 
-        // ----------------- RIGHT: Claims Table & Inspection -----------------
         VBox rightCard = new VBox(12);
         rightCard.getStyleClass().add("card");
         HBox.setHgrow(rightCard, Priority.ALWAYS);
@@ -190,7 +180,6 @@ public class ClaimsView {
 
         claimsTable.getColumns().addAll(List.of(idCol, itemCol, dateCol, statusCol));
 
-        // Details / Inspector Box below table
         VBox inspectorBox = new VBox(8);
         inspectorBox.setStyle("-fx-background-color: #f8fafc; -fx-padding: 12px; -fx-background-radius: 8px; -fx-border-color: #e2e8f0; -fx-border-radius: 8px;");
 
@@ -236,7 +225,6 @@ public class ClaimsView {
 
         root.getChildren().addAll(headerCard, mainLayout);
 
-        // Initial Data Load
         refreshClaims();
         loadFoundItems();
     }
@@ -367,7 +355,6 @@ public class ClaimsView {
 
         detailProofText.setText(claim.getVerificationDetails());
 
-        // Show admin actions if logged in as Admin and claim is PENDING
         if (SessionManager.isAdmin() && claim.getStatus() == ClaimStatus.PENDING) {
             adminActionBox.setVisible(true);
             adminActionFeedback.setText("");

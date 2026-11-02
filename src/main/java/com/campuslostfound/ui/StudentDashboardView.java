@@ -17,10 +17,6 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 
-/**
- * Screen 3: Student Dashboard
- * Hub for students to launch actions (Report, Search, Matches, Claims) and inspect their activity.
- */
 public class StudentDashboardView {
 
     private final VBox root;
@@ -32,7 +28,6 @@ public class StudentDashboardView {
         User user = SessionManager.getCurrentUser();
         String studentName = user != null ? user.getName() : "Student";
 
-        // Welcome banner
         VBox banner = new VBox(4);
         Label welcomeLbl = new Label("Welcome back, " + studentName + "!");
         welcomeLbl.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;");
@@ -40,7 +35,6 @@ public class StudentDashboardView {
         welcomeSub.setStyle("-fx-text-fill: #64748b; -fx-font-size: 13px;");
         banner.getChildren().addAll(welcomeLbl, welcomeSub);
 
-        // Metrics Row
         List<Item> myItems = user != null ? ViewNavigator.getItemService().getItemsByReporter(user.getUserId()) : List.of();
         List<Item> activeLost = ViewNavigator.getItemService().getActiveLostItems();
         List<Item> activeFound = ViewNavigator.getItemService().getActiveFoundItems();
@@ -52,7 +46,6 @@ public class StudentDashboardView {
                 createStatCard("ACTIVE CAMPUS FOUND ITEMS", String.valueOf(activeFound.size()), "#059669")
         );
 
-        // Action Cards Grid
         GridPane actionGrid = new GridPane();
         actionGrid.setHgap(16);
         actionGrid.setVgap(16);
@@ -73,7 +66,6 @@ public class StudentDashboardView {
                 "Check the status of claims you submitted for items turned in across campus.",
                 "My Claims", e -> ViewNavigator.showClaims()), 1, 1);
 
-        // Table of User's Reports
         VBox tableCard = new VBox(12);
         tableCard.getStyleClass().add("card");
 

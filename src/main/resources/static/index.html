@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142b4a"><title>Campus Lost & Found</title>
+  <link rel="stylesheet" href="/app.css"><script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="auth-wrap" id="auth-view">
+    <section class="auth-card">
+      <div class="brand-mark">C<span>+</span></div>
+      <p class="eyebrow">CAMPUS COMMUNITY</p><h1>Lost something?<br><em>Let’s bring it home.</em></h1>
+      <p class="muted">Report an item, search campus listings, and track ownership claims in one place.</p>
+      <div class="auth-tabs"><button class="active" data-auth-tab="login">Sign in</button><button data-auth-tab="register">Create account</button></div>
+      <form id="login-form" class="form-stack">
+        <label>Campus email<input name="email" type="email" autocomplete="username" required placeholder="you@campus.edu"></label>
+        <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+        <button class="button primary" type="submit">Sign in <span>→</span></button>
+      </form>
+      <form id="register-form" class="form-stack hidden">
+        <label>Your name<input name="name" required maxlength="100" autocomplete="name"></label>
+        <label>Campus email<input name="email" type="email" required autocomplete="email"></label>
+        <label>Password<input name="password" type="password" minlength="10" required autocomplete="new-password"><small>Use at least 10 characters.</small></label>
+        <button class="button primary" type="submit">Create student account <span>→</span></button>
+      </form>
+      <p class="notice" id="auth-message" role="status"></p>
+    </section>
+    <aside class="auth-aside"><div><span class="pill">A little more found</span><h2>Good things find their way back.</h2><p>Smart matching connects lost and found reports by category, location, date, name, and description.</p></div><div class="aside-foot">A shared campus space for lost property.</div></aside>
+  </div>
+
+  <div id="app-view" class="app hidden">
+    <aside class="sidebar">
+      <a class="side-brand" href="#"><span class="brand-mark small">C<span>+</span></span><span>Campus<br><b>Lost & Found</b></span></a>
+      <div class="side-label">WORKSPACE</div>
+      <nav id="main-nav">
+        <button class="nav-link active" data-page="browse"><span>⌕</span> Browse items</button>
+        <button class="nav-link" data-page="report"><span>＋</span> Report an item</button>
+        <button class="nav-link" data-page="matches"><span>✳</span> Possible matches</button>
+        <button class="nav-link" data-page="claims"><span>▤</span> My claims</button>
+        <button class="nav-link hidden" data-page="admin"><span>◈</span> Admin overview</button>
+      </nav>
+      <div class="sidebar-bottom"><div class="profile"><div class="avatar" id="avatar">C</div><div><strong id="user-name">Campus user</strong><small id="user-role">Student</small></div></div><button id="logout" class="logout">Sign out <span>↗</span></button></div>
+    </aside>
+    <main class="main-area">
+      <header class="topbar"><div><p class="eyebrow" id="page-kicker">CAMPUS DIRECTORY</p><h1 id="page-title">Browse items</h1></div><span class="top-chip"><i></i> Campus community</span></header>
+      <section id="page-content" class="page-content"></section>
+      <footer>Campus Lost & Found <span>•</span> Shared with care</footer>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+</body>
+</html>

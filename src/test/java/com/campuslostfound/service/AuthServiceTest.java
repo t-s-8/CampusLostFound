@@ -23,7 +23,6 @@ class AuthServiceTest {
     private AuthService authService;
     private InMemoryUserDAO userDAO;
 
-    // In-memory test double for UserDAO
     private static class InMemoryUserDAO extends UserDAO {
         private final Map<Integer, User> userMap = new HashMap<>();
         private final Map<String, User> emailMap = new HashMap<>();
@@ -70,7 +69,6 @@ class AuthServiceTest {
         assertEquals(UserRole.STUDENT, user.getRole());
         assertFalse(user.isAdmin());
 
-        // Password must be hashed with SHA-256 (not stored as plaintext)
         assertNotEquals("Password123", user.getPasswordHash());
         assertEquals(64, user.getPasswordHash().length());
     }
@@ -97,17 +95,14 @@ class AuthServiceTest {
     @Test
     @DisplayName("Registration input validation checks")
     void testRegistrationValidation() {
-        // Empty name
         assertThrows(CampusLostFoundException.class, () ->
                 authService.register("", "test@test.edu", "Password123", UserRole.STUDENT)
         );
 
-        // Invalid email
         assertThrows(CampusLostFoundException.class, () ->
                 authService.register("Test User", "invalid-email", "Password123", UserRole.STUDENT)
         );
 
-        // Short password (< 6 chars)
         assertThrows(CampusLostFoundException.class, () ->
                 authService.register("Test User", "test@test.edu", "12345", UserRole.STUDENT)
         );
@@ -128,12 +123,10 @@ class AuthServiceTest {
     void testAuthenticationFailure() {
         authService.register("Bob", "bob@test.edu", "SecretPass123", UserRole.STUDENT);
 
-        // Wrong password
         assertThrows(CampusLostFoundException.class, () ->
                 authService.authenticate("bob@test.edu", "WrongPassword")
         );
 
-        // Unknown email
         assertThrows(CampusLostFoundException.class, () ->
                 authService.authenticate("unknown@test.edu", "SecretPass123")
         );
@@ -142,11 +135,9 @@ class AuthServiceTest {
     @Test
     @DisplayName("Verify SHA-256 hash matches expected output")
     void testPasswordHashingAlgorithm() {
-        // Known SHA-256 test vector for "DevPass@123"
         String hash = AuthService.hashPassword("DevPass@123");
         assertNotNull(hash);
         assertEquals(64, hash.length());
-        // Hash must be deterministic
         assertEquals(hash, AuthService.hashPassword("DevPass@123"));
     }
 }

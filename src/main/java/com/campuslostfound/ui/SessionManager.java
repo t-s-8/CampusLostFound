@@ -3,9 +3,6 @@ package com.campuslostfound.ui;
 import com.campuslostfound.model.User;
 import com.campuslostfound.model.UserRole;
 
-/**
- * Manages in-memory state for the currently authenticated user session.
- */
 public class SessionManager {
 
     private static User currentUser;

@@ -47,7 +47,6 @@ erDiagram
         timestamp reviewed_at "NULLABLE"
     }
 
-    %% Relationships and Cardinalities
     users ||--o{ items : "reports (1:N)"
     locations ||--o{ items : "located_at (1:N)"
     items ||--o{ matches : "lost_item_in (1:N)"

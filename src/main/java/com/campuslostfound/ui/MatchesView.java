@@ -16,10 +16,6 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Screen 6: Matches View
- * Displays candidate pairs ranked by MatchPriorityQueue and MatchAlgorithm.
- */
 public class MatchesView {
 
     private final VBox root;
@@ -32,7 +28,6 @@ public class MatchesView {
         root = new VBox(16);
         root.getStyleClass().add("content-container");
 
-        // Informational Banner Card
         VBox banner = new VBox(6);
         banner.getStyleClass().add("card");
         banner.setStyle("-fx-border-color: #bfdbfe; -fx-background-color: #eff6ff;");
@@ -46,7 +41,6 @@ public class MatchesView {
 
         banner.getChildren().addAll(bannerTitle, bannerText);
 
-        // Matches Table
         table = new TableView<>();
         table.setPlaceholder(new Label("No match candidates found in database. Report complementary LOST and FOUND items to generate matches."));
         VBox.setVgrow(table, Priority.ALWAYS);
@@ -112,7 +106,6 @@ public class MatchesView {
 
         table.getColumns().addAll(List.of(idCol, lostCol, foundCol, scoreCol, statusCol));
 
-        // Side-by-Side Comparison Inspector Card
         VBox inspectorCard = new VBox(10);
         inspectorCard.getStyleClass().add("card");
         inspectorCard.setPrefHeight(150);
@@ -144,7 +137,6 @@ public class MatchesView {
 
         inspectorCard.getChildren().addAll(inspectTitle, splitBox, scoreExplanationLbl);
 
-        // Selection Listener
         table.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, match) -> {
             if (match != null) {
                 Optional<Item> lostOpt = ViewNavigator.getItemService().getItemById(match.getLostItemId());
@@ -165,7 +157,6 @@ public class MatchesView {
             }
         });
 
-        // Load data
         List<Match> matches = ViewNavigator.getMatchService().getAllMatches();
         table.setItems(FXCollections.observableArrayList(matches));
 

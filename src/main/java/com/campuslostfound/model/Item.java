@@ -6,10 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-/**
- * Abstract base class representing a generic item reported on campus.
- * Demonstrates abstraction, encapsulation, and serves as the polymorphic base for LostItem and FoundItem.
- */
 public abstract class Item {
 
     private int itemId;
@@ -23,25 +19,16 @@ public abstract class Item {
     private ItemStatus status;
     private LocalDateTime createdAt;
 
-    /**
-     * Protected constructor for subclasses creating a new item report (without ID).
-     */
     protected Item(int userId, int locationId, String name, String category,
                    String description, ItemType itemType, LocalDate itemDate) {
         this(0, userId, locationId, name, category, description, itemType, itemDate, ItemStatus.ACTIVE, LocalDateTime.now());
     }
 
-    /**
-     * Protected overloaded constructor with item ID and default ACTIVE status.
-     */
     protected Item(int itemId, int userId, int locationId, String name, String category,
                    String description, ItemType itemType, LocalDate itemDate) {
         this(itemId, userId, locationId, name, category, description, itemType, itemDate, ItemStatus.ACTIVE, LocalDateTime.now());
     }
 
-    /**
-     * Protected full constructor for instantiating items loaded from database.
-     */
     protected Item(int itemId, int userId, int locationId, String name, String category,
                    String description, ItemType itemType, LocalDate itemDate,
                    ItemStatus status, LocalDateTime createdAt) {
@@ -60,14 +47,8 @@ public abstract class Item {
         this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
     }
 
-    /**
-     * Polymorphic method to return a formatted display summary specific to the item type.
-     */
     public abstract String getDisplayDetails();
 
-    /**
-     * Polymorphic method determining whether this item is currently claimable by a claimant.
-     */
     public abstract boolean isClaimable();
 
     public int getItemId() {

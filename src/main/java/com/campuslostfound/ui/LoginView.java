@@ -13,10 +13,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-/**
- * Screen 1: Login View
- * Authenticates users through AuthService and routes based on role (Student vs Admin).
- */
 public class LoginView {
 
     private final StackPane root;
@@ -31,7 +27,6 @@ public class LoginView {
         card.setMaxWidth(420);
         card.setAlignment(Pos.TOP_LEFT);
 
-        // Header
         Label headerTitle = new Label("Campus Lost & Found");
         headerTitle.getStyleClass().add("card-title");
         headerTitle.setStyle("-fx-font-size: 20px; -fx-text-fill: #1e3a8a;");
@@ -39,7 +34,6 @@ public class LoginView {
         Label headerSub = new Label("Sign in with your campus email account");
         headerSub.setStyle("-fx-text-fill: #64748b; -fx-font-size: 12px;");
 
-        // Fields
         Label emailLbl = new Label("Campus Email");
         emailLbl.getStyleClass().add("form-label");
         TextField emailField = new TextField();
@@ -59,7 +53,6 @@ public class LoginView {
         loginBtn.getStyleClass().add("btn-primary");
         loginBtn.setMaxWidth(Double.MAX_VALUE);
 
-        // Quick register link
         HBox registerLinkBox = new HBox(5);
         registerLinkBox.setAlignment(Pos.CENTER);
         Label noAccLbl = new Label("Don't have an account?");
@@ -68,7 +61,6 @@ public class LoginView {
         registerLink.setOnAction(e -> ViewNavigator.showRegister());
         registerLinkBox.getChildren().addAll(noAccLbl, registerLink);
 
-        // Demo credentials box for student viva demo
         VBox devHintBox = new VBox(4);
         devHintBox.setStyle("-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 6px; -fx-padding: 10px;");
         Label devTitle = new Label("Local Development Accounts (DevPass@123):");
@@ -79,7 +71,6 @@ public class LoginView {
         devStudent.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b;");
         devHintBox.getChildren().addAll(devTitle, devAdmin, devStudent);
 
-        // Action
         loginBtn.setOnAction(e -> {
             String email = emailField.getText();
             String pwd = pwdField.getText();

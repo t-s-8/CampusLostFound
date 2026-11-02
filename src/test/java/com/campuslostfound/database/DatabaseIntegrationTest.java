@@ -25,8 +25,6 @@ class DatabaseIntegrationTest {
 
     @BeforeAll
     static void checkDatabaseAvailability() {
-        // Enforce that tests only run if local MySQL is accessible.
-        // If credentials are not configured or MySQL is offline, the test is honestly skipped.
         boolean available = DatabaseConnection.isDatabaseAvailable();
         Assumptions.assumeTrue(available,
                 "Local MySQL database is not reachable or credentials not configured. Skipping live database integration tests.");

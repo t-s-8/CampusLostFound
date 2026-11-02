@@ -31,7 +31,6 @@ class ItemServiceTest {
     private InMemoryLocationDAO locationDAO;
     private TestMatchService matchService;
 
-    // In-memory test doubles
     private static class InMemoryItemDAO extends ItemDAO {
         private final Map<Integer, Item> items = new HashMap<>();
         private int sequence = 1;

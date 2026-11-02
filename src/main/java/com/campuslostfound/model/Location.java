@@ -2,32 +2,20 @@ package com.campuslostfound.model;
 
 import java.util.Objects;
 
-/**
- * Represents a physical campus area or building where items are lost or found.
- */
 public class Location {
 
     private int locationId;
     private String locationName;
     private String building;
 
-    /**
-     * Overloaded constructor without building.
-     */
     public Location(String locationName) {
         this(0, locationName, null);
     }
 
-    /**
-     * Overloaded constructor without ID.
-     */
     public Location(String locationName, String building) {
         this(0, locationName, building);
     }
 
-    /**
-     * Full constructor for instantiating locations from database.
-     */
     public Location(int locationId, String locationName, String building) {
         setLocationId(locationId);
         setLocationName(locationName);
@@ -64,9 +52,6 @@ public class Location {
         this.building = (building != null && !building.trim().isEmpty()) ? building.trim() : null;
     }
 
-    /**
-     * Returns a human-readable composite location descriptor.
-     */
     public String getFullLocation() {
         if (building == null || building.isEmpty()) {
             return locationName;

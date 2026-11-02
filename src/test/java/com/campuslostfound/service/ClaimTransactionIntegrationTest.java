@@ -28,14 +28,6 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Phase 5 Integration Test Suite verifying:
- * - Real JDBC transactional claim approval
- * - Mid-transaction failure and rollback verification
- * - Claim rejection without item state modification
- * - Prevention of repeated approvals and invalid item state transitions
- * - Real database analytics aggregations
- */
 @DisplayName("Phase 5: Claim Transaction & Admin Analytics Integration Tests")
 class ClaimTransactionIntegrationTest {
 
@@ -64,7 +56,6 @@ class ClaimTransactionIntegrationTest {
         claimService = new ClaimService(claimDAO, itemDAO, userDAO);
         analyticsService = new AnalyticsService(new AnalyticsDAO());
 
-        // Ensure test users exist in local database
         String ts = String.valueOf(System.currentTimeMillis() % 100000);
         studentFinder = userDAO.create(new User(0, "Finder_" + ts, "finder_" + ts + "@test.edu",
                 AuthService.hashPassword("Pass123"), UserRole.STUDENT, LocalDateTime.now()));
@@ -77,24 +68,20 @@ class ClaimTransactionIntegrationTest {
     @Test
     @DisplayName("Transactional Claim Approval: Commits APPROVED claim and RECOVERED item")
     void testSuccessfulClaimApprovalTransaction() {
-        // 1. Create an active found item reported by finder
         FoundItem foundItem = (FoundItem) itemDAO.create(new FoundItem(
                 studentFinder.getUserId(), 1, "Scientific Calculator Casio",
                 "Electronics", "Casio FX-991EX with name sticker", LocalDate.now()
         ));
         assertEquals(ItemStatus.ACTIVE, foundItem.getStatus());
 
-        // 2. Claimant files an ownership claim
         Claim claim = claimService.submitClaim(
                 foundItem.getItemId(), studentClaimant.getUserId(), "Has my initials engraved inside battery hatch"
         );
         assertEquals(ClaimStatus.PENDING, claim.getStatus());
 
-        // 3. Admin approves claim in a real JDBC transaction
         boolean approved = claimService.approveClaim(claim.getClaimId(), adminUser.getUserId());
         assertTrue(approved, "Transactional approval must return true on commit");
 
-        // 4. Verify database state
         Claim reloadedClaim = claimDAO.findById(claim.getClaimId()).orElseThrow();
         assertEquals(ClaimStatus.APPROVED, reloadedClaim.getStatus(), "Claim status in DB must be APPROVED");
         assertEquals(adminUser.getUserId(), reloadedClaim.getReviewedBy(), "Reviewer ID must match admin");
@@ -107,32 +94,26 @@ class ClaimTransactionIntegrationTest {
     @Test
     @DisplayName("Transaction Rollback: Failure mid-transaction rolls back all partial changes")
     void testTransactionRollbackOnFailure() {
-        // 1. Create an active found item
         FoundItem foundItem = (FoundItem) itemDAO.create(new FoundItem(
                 studentFinder.getUserId(), 1, "Sony Noise-Canceling Headphones",
                 "Electronics", "Black over-ear headphones in hard case", LocalDate.now()
         ));
 
-        // 2. Submit a pending claim
         Claim claim = claimService.submitClaim(
                 foundItem.getItemId(), studentClaimant.getUserId(), "Bluetooth address ends with 7A:B2"
         );
         assertEquals(ClaimStatus.PENDING, claim.getStatus());
 
-        // 3. Attempt approval with simulated mid-transaction failure
         assertThrows(CampusLostFoundException.class, () ->
                 claimService.approveClaimWithSimulatedFailure(claim.getClaimId(), adminUser.getUserId()),
                 "Simulated transaction failure must cause an exception and roll back"
         );
 
-        // 4. CRITICAL VERIFICATION: Inspect fresh database state
-        // Claim MUST still be PENDING (not APPROVED)
         Claim reloadedClaim = claimDAO.findById(claim.getClaimId()).orElseThrow();
         assertEquals(ClaimStatus.PENDING, reloadedClaim.getStatus(),
                 "Rollback must ensure claim remains PENDING after failure");
         assertNull(reloadedClaim.getReviewedBy(), "Reviewer ID must remain NULL after rollback");
 
-        // Target item MUST still be ACTIVE (not RECOVERED)
         Item reloadedItem = itemDAO.findById(foundItem.getItemId()).orElseThrow();
         assertEquals(ItemStatus.ACTIVE, reloadedItem.getStatus(),
                 "Rollback must ensure item remains ACTIVE after failure");
@@ -173,10 +154,8 @@ class ClaimTransactionIntegrationTest {
                 foundItem.getItemId(), studentClaimant.getUserId(), "Has broken rib"
         );
 
-        // First approval succeeds
         assertTrue(claimService.approveClaim(claim.getClaimId(), adminUser.getUserId()));
 
-        // Repeated approval on already approved claim must fail
         assertThrows(InvalidClaimException.class, () ->
                 claimService.approveClaim(claim.getClaimId(), adminUser.getUserId()),
                 "Approving an already approved claim must throw InvalidClaimException"
@@ -186,14 +165,12 @@ class ClaimTransactionIntegrationTest {
     @Test
     @DisplayName("Invalid Item States: Cannot claim or approve already RECOVERED items")
     void testInvalidItemStateClaiming() {
-        // 1. Create an item that is already RECOVERED
         FoundItem recoveredItem = (FoundItem) itemDAO.create(new FoundItem(
                 studentFinder.getUserId(), 1, "Archived Recovered Laptop",
                 "Electronics", "Old report", LocalDate.now()
         ));
         itemDAO.updateStatus(recoveredItem.getItemId(), ItemStatus.RECOVERED);
 
-        // 2. Attempting to file a claim on a RECOVERED item must fail
         assertThrows(InvalidClaimException.class, () ->
                 claimService.submitClaim(recoveredItem.getItemId(), studentClaimant.getUserId(), "I want to claim it"),
                 "Cannot submit a claim on a RECOVERED item"
@@ -203,19 +180,16 @@ class ClaimTransactionIntegrationTest {
     @Test
     @DisplayName("Invalid Claims: Cannot claim a LOST report or file claim without proof")
     void testInvalidClaimSubmissions() {
-        // 1. Create a LOST item
         LostItem lostItem = (LostItem) itemDAO.create(new LostItem(
                 studentFinder.getUserId(), 1, "Lost Gym Bag",
                 "Personal", "Red duffel bag", LocalDate.now()
         ));
 
-        // Cannot claim a LOST item
         assertThrows(InvalidClaimException.class, () ->
                 claimService.submitClaim(lostItem.getItemId(), studentClaimant.getUserId(), "Proof text"),
                 "Cannot submit a claim on a LOST report"
         );
 
-        // Cannot claim with empty proof
         FoundItem foundItem = (FoundItem) itemDAO.create(new FoundItem(
                 studentFinder.getUserId(), 1, "Found Thermos",
                 "Accessories", "Steel thermos", LocalDate.now()
@@ -225,7 +199,6 @@ class ClaimTransactionIntegrationTest {
                 "Cannot submit claim with blank verification details"
         );
 
-        // Finder cannot claim their own turn-in
         assertThrows(InvalidClaimException.class, () ->
                 claimService.submitClaim(foundItem.getItemId(), studentFinder.getUserId(), "My own found item"),
                 "Finder cannot claim the item they turned in"
@@ -251,13 +224,11 @@ class ClaimTransactionIntegrationTest {
         assertNotNull(stats.getTopLocations(), "Top locations list must not be null");
         assertNotNull(stats.getTopCategories(), "Top categories list must not be null");
 
-        // Verify that location stats entries have valid fields
         for (AdminAnalytics.LocationStat locStat : stats.getTopLocations()) {
             assertNotNull(locStat.locationName(), "Location name must not be null");
             assertTrue(locStat.totalReports() >= 0, "Location total reports must be non-negative");
         }
 
-        // Verify that category stats entries have valid fields
         for (AdminAnalytics.CategoryStat catStat : stats.getTopCategories()) {
             assertNotNull(catStat.category(), "Category must not be null");
             assertTrue(catStat.totalReports() >= 0, "Category total reports must be non-negative");

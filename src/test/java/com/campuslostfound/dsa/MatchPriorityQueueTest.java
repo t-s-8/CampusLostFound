@@ -50,11 +50,9 @@ class MatchPriorityQueueTest {
         assertEquals(4, pq.size());
         assertFalse(pq.isEmpty());
 
-        // Peek should be the highest (92.5) without removing it
         assertEquals(m2, pq.peek());
         assertEquals(4, pq.size());
 
-        // Poll order must be strictly descending: 92.5 -> 74.0 -> 55.0 -> 30.0
         assertEquals(m2, pq.poll());
         assertEquals(m3, pq.poll());
         assertEquals(m1, pq.poll());
@@ -67,20 +65,17 @@ class MatchPriorityQueueTest {
     @DisplayName("Equal scores resolve deterministically via secondary and tertiary tie-breakers")
     void testEqualScoresTieBreaking() {
         LocalDateTime t1 = LocalDateTime.of(2026, 10, 10, 10, 0);
-        LocalDateTime t2 = LocalDateTime.of(2026, 10, 10, 12, 0); // newer timestamp
+        LocalDateTime t2 = LocalDateTime.of(2026, 10, 10, 12, 0);
 
-        // Same score 80.0, but mNewer has newer timestamp
         Match mOlder = new Match(1, 10, 20, 80.0, MatchStatus.PENDING, t1);
         Match mNewer = new Match(2, 11, 21, 80.0, MatchStatus.PENDING, t2);
 
         pq.add(mOlder);
         pq.add(mNewer);
 
-        // Newer timestamp should be polled first
         assertEquals(mNewer, pq.poll(), "Newer timestamp should break tie before older timestamp");
         assertEquals(mOlder, pq.poll());
 
-        // Same score and same timestamp -> lower matchId wins
         Match mId10 = new Match(10, 10, 20, 80.0, MatchStatus.PENDING, t1);
         Match mId20 = new Match(20, 11, 21, 80.0, MatchStatus.PENDING, t1);
 
@@ -109,7 +104,6 @@ class MatchPriorityQueueTest {
         assertEquals(mHigh, possible.get(0));
         assertEquals(mThreshold, possible.get(1));
 
-        // Original priority queue must NOT be mutated by getPossibleMatches()
         assertEquals(4, pq.size());
         assertEquals(mHigh, pq.peek());
     }

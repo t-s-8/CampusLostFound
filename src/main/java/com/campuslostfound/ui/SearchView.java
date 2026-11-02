@@ -23,10 +23,6 @@ import javafx.util.StringConverter;
 
 import java.util.List;
 
-/**
- * Screen 5: Search Items View
- * Multi-criteria search and filtering connecting to SearchService and ItemDAO.
- */
 public class SearchView {
 
     private final VBox root;
@@ -41,7 +37,6 @@ public class SearchView {
         root = new VBox(16);
         root.getStyleClass().add("content-container");
 
-        // Filter Card
         VBox filterCard = new VBox(12);
         filterCard.getStyleClass().add("card");
 
@@ -94,7 +89,6 @@ public class SearchView {
         filterRow.getChildren().addAll(keywordField, catCombo, locCombo, typeCombo, statusCombo, searchBtn, resetBtn);
         filterCard.getChildren().addAll(searchTitle, filterRow);
 
-        // Results Table
         table = new TableView<>();
         table.setPlaceholder(new Label("No items match your search criteria."));
         VBox.setVgrow(table, Priority.ALWAYS);
@@ -140,7 +134,6 @@ public class SearchView {
 
         table.getColumns().addAll(List.of(idCol, typeCol, nameCol, catCol, dateCol, statusCol));
 
-        // Details Panel Card at Bottom
         VBox detailCard = new VBox(8);
         detailCard.getStyleClass().add("card");
         detailCard.setPrefHeight(130);
@@ -173,7 +166,6 @@ public class SearchView {
 
         detailCard.getChildren().addAll(detailHeader, detailDescLbl, detailLocLbl);
 
-        // Table Selection listener
         table.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             selectedItem = newVal;
             if (newVal != null) {
@@ -181,7 +173,6 @@ public class SearchView {
                 detailDescLbl.setText("Description: " + (newVal.getDescription().isEmpty() ? "No description provided." : newVal.getDescription()));
                 detailLocLbl.setText("Location ID: " + newVal.getLocationId() + " | Reported Date: " + newVal.getItemDate() + " | Status: " + newVal.getStatus());
 
-                // Show claim button if it is an active found item and user is not admin
                 claimActionBtn.setVisible(newVal.getItemType() == ItemType.FOUND && newVal.isClaimable() && !SessionManager.isAdmin());
             } else {
                 detailNameLbl.setText("Select an item above to inspect detailed description");
@@ -191,7 +182,6 @@ public class SearchView {
             }
         });
 
-        // Search action
         Runnable performSearch = () -> {
             String kw = keywordField.getText();
             String cat = "All Categories".equals(catCombo.getValue()) ? null : catCombo.getValue();
@@ -215,7 +205,6 @@ public class SearchView {
             performSearch.run();
         });
 
-        // Initial search load
         performSearch.run();
 
         root.getChildren().addAll(filterCard, table, detailCard);

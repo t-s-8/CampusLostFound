@@ -16,10 +16,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-/**
- * Screen 2: Registration View
- * Registers student or administrative accounts through AuthService.
- */
 public class RegisterView {
 
     private final StackPane root;
@@ -41,7 +37,6 @@ public class RegisterView {
         Label headerSub = new Label("Register to report items, search, and file claims");
         headerSub.setStyle("-fx-text-fill: #64748b; -fx-font-size: 12px;");
 
-        // Fields
         Label nameLbl = new Label("Full Name");
         nameLbl.getStyleClass().add("form-label");
         TextField nameField = new TextField();

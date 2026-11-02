@@ -88,7 +88,7 @@ Focus: Show how modern Object-Oriented principles are genuinely applied in the J
     ```java
     @Override
     public boolean isClaimable() {
-        return false; // Students cannot claim a lost report
+        return false;
     }
     @Override
     public String getDisplayDetails() {

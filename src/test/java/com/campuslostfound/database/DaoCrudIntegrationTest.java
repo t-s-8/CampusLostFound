@@ -71,17 +71,14 @@ class DaoCrudIntegrationTest {
         assertTrue(createdAdmin.getUserId() > 0);
         assertTrue(createdAdmin.isAdmin());
 
-        // Find by email (case-insensitive)
         Optional<User> foundByEmail = userDAO.findByEmail("STUDENT_" + uid + "@TEST.EDU");
         assertTrue(foundByEmail.isPresent());
         assertEquals(createdStudent.getUserId(), foundByEmail.get().getUserId());
 
-        // Find by ID
         Optional<User> foundById = userDAO.findById(createdAdmin.getUserId());
         assertTrue(foundById.isPresent());
         assertEquals("Administration", ((Admin) foundById.get()).getDepartment());
 
-        // Non-existent ID returns empty
         assertFalse(userDAO.findById(99999999).isPresent());
     }
 
@@ -106,43 +103,35 @@ class DaoCrudIntegrationTest {
         User user = userDAO.create(new User(0, "Reporter " + uid, "reporter_" + uid + "@test.edu",
                 AuthService.hashPassword("Pass123"), UserRole.STUDENT, LocalDateTime.now()));
 
-        // Create Lost Item
         LostItem lost = (LostItem) itemDAO.create(new LostItem(
                 user.getUserId(), 1, "Lenovo ThinkPad " + uid, "Electronics", "Black laptop", LocalDate.now()
         ));
         assertTrue(lost.getItemId() > 0);
         assertEquals(ItemType.LOST, lost.getItemType());
 
-        // Create Found Item
         FoundItem found = (FoundItem) itemDAO.create(new FoundItem(
                 user.getUserId(), 1, "Wireless Mouse " + uid, "Electronics", "Logitech mouse", LocalDate.now()
         ));
         assertTrue(found.getItemId() > 0);
         assertEquals(ItemType.FOUND, found.getItemType());
 
-        // Find by ID
         Optional<Item> loadedLost = itemDAO.findById(lost.getItemId());
         assertTrue(loadedLost.isPresent());
         assertEquals("Lenovo ThinkPad " + uid, loadedLost.get().getName());
 
-        // Update status
         assertTrue(itemDAO.updateStatus(lost.getItemId(), ItemStatus.MATCHED));
         assertEquals(ItemStatus.MATCHED, itemDAO.findById(lost.getItemId()).get().getStatus());
 
-        // Find by type and status
         List<Item> matchedItems = itemDAO.findByTypeAndStatus(ItemType.LOST, ItemStatus.MATCHED);
         assertTrue(matchedItems.stream().anyMatch(i -> i.getItemId() == lost.getItemId()));
 
-        // Find by user ID
         List<Item> userItems = itemDAO.findByUserId(user.getUserId());
         assertEquals(2, userItems.size());
 
-        // Dynamic search with multiple parameter combinations
         List<Item> searchResults = itemDAO.search("ThinkPad " + uid, "Electronics", 1, ItemType.LOST, ItemStatus.MATCHED);
         assertEquals(1, searchResults.size());
         assertEquals(lost.getItemId(), searchResults.get(0).getItemId());
 
-        // Search with non-matching filter returns empty list
         List<Item> emptyResults = itemDAO.search("NonExistentStringXYZ123", null, null, null, null);
         assertTrue(emptyResults.isEmpty());
     }
@@ -161,12 +150,10 @@ class DaoCrudIntegrationTest {
         Match saved = matchDAO.create(match);
         assertTrue(saved.getMatchId() > 0);
 
-        // Find by pair
         Optional<Match> byPair = matchDAO.findByLostAndFound(lost.getItemId(), found.getItemId());
         assertTrue(byPair.isPresent());
         assertEquals(82.5, byPair.get().getScore(), 0.01);
 
-        // Upsert behavior on duplicate pair (re-inserting same pair updates score/status without error)
         Match updatedMatch = new Match(lost.getItemId(), found.getItemId(), 95.0, MatchStatus.NOTIFIED, LocalDateTime.now());
         matchDAO.create(updatedMatch);
 
@@ -175,11 +162,9 @@ class DaoCrudIntegrationTest {
         assertEquals(95.0, reloaded.get().getScore(), 0.01);
         assertEquals(MatchStatus.NOTIFIED, reloaded.get().getStatus());
 
-        // Update status directly
         assertTrue(matchDAO.updateStatus(reloaded.get().getMatchId(), MatchStatus.CONFIRMED));
         assertEquals(MatchStatus.CONFIRMED, matchDAO.findByLostAndFound(lost.getItemId(), found.getItemId()).get().getStatus());
 
-        // Find by lost and found item IDs
         assertFalse(matchDAO.findByLostItemId(lost.getItemId()).isEmpty());
         assertFalse(matchDAO.findByFoundItemId(found.getItemId()).isEmpty());
     }
@@ -204,24 +189,19 @@ class DaoCrudIntegrationTest {
         assertTrue(created.getClaimId() > 0);
         assertEquals(ClaimStatus.PENDING, created.getStatus());
 
-        // Find by ID
         Optional<Claim> loaded = claimDAO.findById(created.getClaimId());
         assertTrue(loaded.isPresent());
         assertEquals("Contains student card", loaded.get().getVerificationDetails());
 
-        // Find by item ID
         List<Claim> byItem = claimDAO.findByItemId(item.getItemId());
         assertEquals(1, byItem.size());
 
-        // Find by user ID
         List<Claim> byUser = claimDAO.findByUserId(claimant.getUserId());
         assertFalse(byUser.isEmpty());
 
-        // Find pending claims
         List<Claim> pending = claimDAO.findPendingClaims();
         assertTrue(pending.stream().anyMatch(c -> c.getClaimId() == created.getClaimId()));
 
-        // Update status directly
         assertTrue(claimDAO.updateStatus(created.getClaimId(), ClaimStatus.REJECTED, admin.getUserId(), LocalDateTime.now()));
         Claim rejected = claimDAO.findById(created.getClaimId()).orElseThrow();
         assertEquals(ClaimStatus.REJECTED, rejected.getStatus());

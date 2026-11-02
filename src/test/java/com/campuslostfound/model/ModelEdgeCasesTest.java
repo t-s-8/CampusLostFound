@@ -98,7 +98,6 @@ class ModelEdgeCasesTest {
         assertThrows(InvalidMatchException.class, () -> m1.setFoundItemId(-5));
         assertThrows(InvalidMatchException.class, () -> m1.setStatus(null));
 
-        // Threshold boundary: 69.9 is false, 70.0 is true
         m1.setScore(69.9);
         assertFalse(m1.isPossibleMatch());
         m1.setScore(70.0);
@@ -135,7 +134,6 @@ class ModelEdgeCasesTest {
         assertTrue(emptyAnalytics.getTopCategories().isEmpty());
         assertNotNull(emptyAnalytics.toString());
 
-        // LocationStat and CategoryStat records
         AdminAnalytics.LocationStat locStat = new AdminAnalytics.LocationStat("Library", "Main", 5, 3, 2);
         assertEquals("Library", locStat.locationName());
         assertEquals("Main", locStat.building());

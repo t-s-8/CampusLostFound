@@ -13,9 +13,6 @@ import com.campuslostfound.model.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Service managing ownership claims on found items and administrative claim verification.
- */
 public class ClaimService {
 
     private final ClaimDAO claimDAO;
@@ -32,15 +29,6 @@ public class ClaimService {
         this.userDAO = userDAO;
     }
 
-    /**
-     * Submits a new claim on a found item.
-     * Enforces business rules:
-     * - Target item must exist.
-     * - Target item must be a FOUND item (students cannot claim a lost report).
-     * - Target item must be claimable (status ACTIVE or MATCHED).
-     * - Claimant cannot claim an item they turned in themselves.
-     * - Prevents duplicate pending claims by the same claimant for the same item.
-     */
     public Claim submitClaim(int itemId, int claimantUserId, String verificationDetails) {
         if (verificationDetails == null || verificationDetails.trim().isEmpty()) {
             throw new InvalidClaimException("Verification details/proof must be provided with the claim.");
@@ -64,7 +52,6 @@ public class ClaimService {
             throw new InvalidClaimException("You cannot submit a claim on an item you reported yourself.");
         }
 
-        // Check for existing pending claims by this user on this item
         List<Claim> existingClaims = claimDAO.findByItemId(itemId);
         boolean alreadyPending = existingClaims.stream()
                 .anyMatch(c -> c.getUserId() == claimantUserId && c.getStatus() == ClaimStatus.PENDING);
@@ -77,26 +64,16 @@ public class ClaimService {
         return claimDAO.create(newClaim);
     }
 
-    /**
-     * Approves a claim after admin verification using an atomic database transaction.
-     * Transitions claim status to APPROVED, item status to RECOVERED, and related matches to CONFIRMED.
-     */
     public boolean approveClaim(int claimId, int adminUserId) {
         verifyAdminReviewer(adminUserId);
         return claimDAO.approveClaimTransaction(claimId, adminUserId, false);
     }
 
-    /**
-     * Approves a claim with simulated mid-transaction failure for rollback testing.
-     */
     public boolean approveClaimWithSimulatedFailure(int claimId, int adminUserId) {
         verifyAdminReviewer(adminUserId);
         return claimDAO.approveClaimTransaction(claimId, adminUserId, true);
     }
 
-    /**
-     * Rejects a claim with reviewer record.
-     */
     public boolean rejectClaim(int claimId, int adminUserId) {
         verifyAdminReviewer(adminUserId);
 
@@ -110,23 +87,14 @@ public class ClaimService {
         return claimDAO.updateStatus(claimId, ClaimStatus.REJECTED, adminUserId, LocalDateTime.now());
     }
 
-    /**
-     * Retrieves all pending claims for admin review queue.
-     */
     public List<Claim> getPendingClaims() {
         return claimDAO.findPendingClaims();
     }
 
-    /**
-     * Retrieves all claims submitted by a specific user.
-     */
     public List<Claim> getClaimsForUser(int userId) {
         return claimDAO.findByUserId(userId);
     }
 
-    /**
-     * Retrieves all claims across the campus.
-     */
     public List<Claim> getAllClaims() {
         return claimDAO.findAll();
     }

@@ -77,28 +77,20 @@ class SecurityAndEdgeCasesIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        // Ensure DatabaseConfig is reset to standard credentials after any test overrides
         DatabaseConfig.reset();
     }
-
-    // =========================================================================
-    // 1. SECURITY TESTS
-    // =========================================================================
 
     @Test
     @DisplayName("Security: SQL Injection immunity via PreparedStatement parameter binding")
     void testSqlInjectionImmunity() {
-        // Malicious SQL injection payloads in search keywords and descriptions
         String payload1 = "' OR '1'='1";
         String payload2 = "'; DROP TABLE claims; --";
         String payload3 = "Robert'); DROP TABLE items;--";
 
-        // Must execute cleanly as literal text searches without throwing SQL syntax exceptions
         assertDoesNotThrow(() -> itemDAO.search(payload1, null, null, null, null));
         assertDoesNotThrow(() -> itemDAO.search(payload2, null, null, null, null));
         assertDoesNotThrow(() -> itemDAO.search(payload3, null, null, null, null));
 
-        // Attempt to register with payload in name
         User injectedUser = authService.register(payload1, "sqli_" + System.currentTimeMillis() % 10000 + "@test.edu", "SafePass123", UserRole.STUDENT);
         assertEquals(payload1, injectedUser.getName());
     }
@@ -109,11 +101,9 @@ class SecurityAndEdgeCasesIntegrationTest {
         String rawPassword = "SuperSecretPassword123!";
         User user = authService.register("Secure User", "sec_" + System.currentTimeMillis() % 10000 + "@test.edu", rawPassword, UserRole.STUDENT);
 
-        // Verify that stored password hash is SHA-256 (64 hex characters) and does not match plaintext
         assertNotEquals(rawPassword, user.getPasswordHash());
         assertEquals(64, user.getPasswordHash().length());
 
-        // Re-read directly from DB
         User dbUser = userDAO.findById(user.getUserId()).orElseThrow();
         assertEquals(user.getPasswordHash(), dbUser.getPasswordHash());
         assertFalse(dbUser.toString().contains(rawPassword));
@@ -128,7 +118,6 @@ class SecurityAndEdgeCasesIntegrationTest {
         ));
         Claim claim = claimService.submitClaim(found.getItemId(), student2.getUserId(), "Has my family crest");
 
-        // student1 (role STUDENT) attempts to approve or reject
         assertThrows(InvalidClaimException.class, () ->
                 claimService.approveClaim(claim.getClaimId(), student1.getUserId()),
                 "Student must not be allowed to approve claims"
@@ -138,15 +127,10 @@ class SecurityAndEdgeCasesIntegrationTest {
                 "Student must not be allowed to reject claims"
         );
 
-        // Non-existent reviewer ID rejected
         assertThrows(InvalidClaimException.class, () ->
                 claimService.approveClaim(claim.getClaimId(), 99999999)
         );
     }
-
-    // =========================================================================
-    // 2. EDGE CASE TESTS
-    // =========================================================================
 
     @Test
     @DisplayName("Edge Case: Duplicate email registration is prevented")
@@ -162,7 +146,6 @@ class SecurityAndEdgeCasesIntegrationTest {
     @Test
     @DisplayName("Edge Case: No matching candidates yields empty PriorityQueue without errors")
     void testNoMatchingCandidates() {
-        // Report an isolated unique item with no complementary reports
         LostItem isolatedItem = (LostItem) itemDAO.create(new LostItem(
                 student1.getUserId(), 1, "Rare Antique Pocket Clock 1850",
                 "Antiques", "Brass mechanical clockwork", LocalDate.of(2020, 1, 1)
@@ -170,7 +153,6 @@ class SecurityAndEdgeCasesIntegrationTest {
 
         List<Match> matches = matchService.findAndRecordMatchesForItem(isolatedItem);
         assertNotNull(matches);
-        // Possible matches (score >= 70) should be empty
         assertTrue(matches.stream().noneMatch(Match::isPossibleMatch));
     }
 
@@ -181,10 +163,8 @@ class SecurityAndEdgeCasesIntegrationTest {
                 student1.getUserId(), 1, "Sunglasses Ray-Ban", "Accessories", "Polarized", LocalDate.now()
         ));
 
-        // First claim succeeds
         claimService.submitClaim(found.getItemId(), student2.getUserId(), "First claim verification");
 
-        // Second claim by same student on same item must be rejected
         assertThrows(InvalidClaimException.class, () ->
                 claimService.submitClaim(found.getItemId(), student2.getUserId(), "Second claim duplicate attempt")
         );
@@ -201,14 +181,11 @@ class SecurityAndEdgeCasesIntegrationTest {
     @Test
     @DisplayName("Edge Case: Database connection failure probe safely returns false")
     void testDatabaseConnectionFailureProbe() {
-        // Temporarily configure an invalid host / port
         DatabaseConfig.setCredentials("jdbc:mysql://localhost:9999/non_existent_db", "invalid_user", "invalid_pass");
 
-        // isDatabaseAvailable() must safely return false without throwing an unhandled exception
         boolean available = DatabaseConnection.isDatabaseAvailable();
         assertFalse(available, "Invalid database configuration must return false");
 
-        // Reset restores standard configuration
         DatabaseConfig.reset();
         assertTrue(DatabaseConnection.isDatabaseAvailable(), "Reset must restore healthy connection");
     }

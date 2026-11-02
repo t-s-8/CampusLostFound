@@ -86,24 +86,20 @@ class MatchServiceTest {
     void testFindAndRecordMatchesRanksAndPersists() {
         LocalDate date = LocalDate.of(2026, 10, 10);
 
-        // Found candidates in database
         Item foundSimilar = new FoundItem(1, 10, 1, "Blue Hydro Flask Bottle", "Accessories", "32oz blue bottle", date);
         Item foundDifferent = new FoundItem(2, 20, 5, "Winter Scarf", "Clothing", "Red woolen scarf", date);
         itemDAO.add(foundSimilar);
         itemDAO.add(foundDifferent);
 
-        // Newly reported lost item
         Item newLostItem = new LostItem(100, 30, 1, "Blue Hydro Flask", "Accessories", "32oz bottle", date);
 
         List<Match> ranked = matchService.findAndRecordMatchesForItem(newLostItem);
         assertEquals(2, ranked.size());
 
-        // Max-Heap priority queue should place foundSimilar first (Score near 100)
         Match topMatch = ranked.get(0);
         assertEquals(1, topMatch.getFoundItemId());
         assertTrue(topMatch.getScore() >= 70.0, "Score should exceed 70.0 possible match threshold");
 
-        // Possible match (score >= 70) must have been persisted to matchDAO
         assertTrue(matchDAO.getCount() >= 1);
     }
 }

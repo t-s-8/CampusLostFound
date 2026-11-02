@@ -25,21 +25,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Screen 8: Admin Dashboard View
- * Comprehensive administrative command center featuring:
- * - Aggregated KPI metrics (Part C Analytics: Total LOST, Total FOUND, Active, Recovered, Pending, Approved, Recovery Rate).
- * - Most reported locations (JOIN + GROUP BY + ORDER BY).
- * - Most common categories with LOST vs. FOUND breakdown.
- * - Atomic transactional claim verification queue (Part B).
- * - All campus reports and lifecycle status monitor.
- */
 public class AdminDashboardView {
 
     private final ScrollPane scrollPane;
     private final VBox root;
 
-    // Stat labels
     private final Label totalLostStat;
     private final Label totalFoundStat;
     private final Label activeReportsStat;
@@ -48,11 +38,9 @@ public class AdminDashboardView {
     private final Label approvedClaimsStat;
     private final Label recoveryRateStat;
 
-    // Analytics Tables (Part C)
     private final TableView<AdminAnalytics.LocationStat> locationAnalyticsTable;
     private final TableView<AdminAnalytics.CategoryStat> categoryAnalyticsTable;
 
-    // Pending Claims Queue (Part B)
     private final TableView<Claim> pendingClaimsTable;
     private final TextArea claimProofInspector;
     private final Label claimInspectorMetaLbl;
@@ -60,7 +48,6 @@ public class AdminDashboardView {
     private final Button rejectBtn;
     private final Label adminActionFeedback;
 
-    // Recent Reports Table
     private final TableView<Item> recentItemsTable;
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -76,7 +63,6 @@ public class AdminDashboardView {
         User admin = SessionManager.getCurrentUser();
         String adminName = admin != null ? admin.getName() : "Administrator";
 
-        // 1. Welcome & Navigational Action Bar
         VBox topCard = new VBox(12);
         topCard.getStyleClass().add("card");
 
@@ -94,7 +80,6 @@ public class AdminDashboardView {
 
         welcomeRow.getChildren().add(titleBox);
 
-        // Navigation Quick Action Buttons
         HBox navBar = new HBox(10);
         navBar.setAlignment(Pos.CENTER_LEFT);
 
@@ -121,7 +106,6 @@ public class AdminDashboardView {
         navBar.getChildren().addAll(navSearch, navMatches, navClaims, navReport, refreshAllBtn);
         topCard.getChildren().addAll(welcomeRow, navBar);
 
-        // 2. Statistics Grid (Database Aggregates: Lost vs Found, Active, Recovered, Claims)
         HBox statsRow1 = new HBox(12);
         statsRow1.setAlignment(Pos.CENTER);
 
@@ -143,10 +127,8 @@ public class AdminDashboardView {
 
         statsRow1.getChildren().addAll(cardLost, cardFound, cardActive, cardRecovered, cardPendingClaims, cardApprovedClaims, cardRate);
 
-        // 3. Analytics Section: Most Reported Locations & Most Common Categories
         HBox analyticsSection = new HBox(16);
 
-        // --- Left: Top Locations Table ---
         VBox locationsCard = new VBox(10);
         locationsCard.getStyleClass().add("card");
         HBox.setHgrow(locationsCard, Priority.ALWAYS);
@@ -183,7 +165,6 @@ public class AdminDashboardView {
         locationAnalyticsTable.getColumns().addAll(List.of(locNameCol, locBldgCol, locTotalCol, locLostCol, locFoundCol));
         locationsCard.getChildren().addAll(locTitle, locSub, locationAnalyticsTable);
 
-        // --- Right: Top Categories Table ---
         VBox categoriesCard = new VBox(10);
         categoriesCard.getStyleClass().add("card");
         HBox.setHgrow(categoriesCard, Priority.ALWAYS);
@@ -218,7 +199,6 @@ public class AdminDashboardView {
 
         analyticsSection.getChildren().addAll(locationsCard, categoriesCard);
 
-        // 4. Middle Section: Pending Claims Verification Queue (Part B: Atomic Transactional Review)
         VBox pendingClaimsCard = new VBox(10);
         pendingClaimsCard.getStyleClass().add("card");
 
@@ -258,7 +238,6 @@ public class AdminDashboardView {
 
         pendingClaimsTable.getColumns().addAll(List.of(pIdCol, pItemCol, pClaimantCol, pDateCol));
 
-        // Inspector and action box for pending claim
         VBox inspectorBox = new VBox(6);
         inspectorBox.setStyle("-fx-background-color: #f8fafc; -fx-padding: 10px; -fx-border-color: #e2e8f0; -fx-border-radius: 6px;");
 
@@ -311,7 +290,6 @@ public class AdminDashboardView {
 
         pendingClaimsCard.getChildren().addAll(queueTitle, queueDesc, pendingClaimsTable, inspectorBox);
 
-        // 5. Bottom Section: All Campus Reports & Lifecycle Status Monitor
         VBox recentReportsCard = new VBox(10);
         recentReportsCard.getStyleClass().add("card");
         VBox.setVgrow(recentReportsCard, Priority.ALWAYS);
@@ -448,7 +426,6 @@ public class AdminDashboardView {
 
     private void refreshData() {
         try {
-            // Fetch real database aggregated analytics
             AdminAnalytics analytics = ViewNavigator.getAnalyticsService().getSystemAnalytics();
 
             totalLostStat.setText(String.valueOf(analytics.getTotalLostItems()));
@@ -459,11 +436,9 @@ public class AdminDashboardView {
             approvedClaimsStat.setText(String.valueOf(analytics.getApprovedClaims()));
             recoveryRateStat.setText(String.format("%.1f%%", analytics.getRecoveryRatePercentage()));
 
-            // Update top locations and top categories tables
             locationAnalyticsTable.setItems(FXCollections.observableArrayList(analytics.getTopLocations()));
             categoryAnalyticsTable.setItems(FXCollections.observableArrayList(analytics.getTopCategories()));
 
-            // Update pending claims queue & all campus items
             List<Claim> pendingClaims = ViewNavigator.getClaimService().getPendingClaims();
             List<Item> allItems = ViewNavigator.getItemService().getAllItems();
 

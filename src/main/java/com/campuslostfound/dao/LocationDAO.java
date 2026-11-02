@@ -13,14 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Data Access Object (DAO) for Location persistence operations.
- */
 public class LocationDAO {
 
-    /**
-     * Persists a new campus location.
-     */
     public Location create(Location location) {
         String sql = "INSERT INTO locations (location_name, building) VALUES (?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -45,9 +39,6 @@ public class LocationDAO {
         }
     }
 
-    /**
-     * Finds a location by its ID.
-     */
     public Optional<Location> findById(int locationId) {
         String sql = "SELECT location_id, location_name, building FROM locations WHERE location_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -65,9 +56,6 @@ public class LocationDAO {
         }
     }
 
-    /**
-     * Retrieves all campus locations ordered alphabetically.
-     */
     public List<Location> findAll() {
         String sql = "SELECT location_id, location_name, building FROM locations ORDER BY location_name";
         List<Location> locations = new ArrayList<>();

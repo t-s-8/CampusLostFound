@@ -3,10 +3,6 @@ package com.campuslostfound.model;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-/**
- * Represents a registered user in the Campus Lost & Found system.
- * Demonstrates encapsulation and serves as the superclass for role-specific specializations.
- */
 public class User {
 
     private int userId;
@@ -16,23 +12,14 @@ public class User {
     private UserRole role;
     private LocalDateTime createdAt;
 
-    /**
-     * Overloaded constructor for newly registered users (ID and timestamp generated later).
-     */
     public User(String name, String email, String passwordHash, UserRole role) {
         this(0, name, email, passwordHash, role, LocalDateTime.now());
     }
 
-    /**
-     * Overloaded constructor with default STUDENT role.
-     */
     public User(String name, String email, String passwordHash) {
         this(0, name, email, passwordHash, UserRole.STUDENT, LocalDateTime.now());
     }
 
-    /**
-     * Full constructor for instantiating users loaded from the database.
-     */
     public User(int userId, String name, String email, String passwordHash, UserRole role, LocalDateTime createdAt) {
         setUserId(userId);
         setName(name);

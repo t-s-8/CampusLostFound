@@ -20,14 +20,10 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-/**
- * Central UI navigation controller coordinating scenes and service injection.
- */
 public class ViewNavigator {
 
     private static Stage primaryStage;
 
-    // Backend Services
     private static final AuthService authService = new AuthService();
     private static final MatchService matchService = new MatchService();
     private static final LocationDAO locationDAO = new LocationDAO();
@@ -132,13 +128,9 @@ public class ViewNavigator {
         primaryStage.show();
     }
 
-    /**
-     * Decorates view content with top branding bar and navigation tabs.
-     */
     public static BorderPane wrapWithNavigation(Parent content, String activeTab) {
         BorderPane layout = new BorderPane();
 
-        // 1. Top Navbar
         HBox topBar = new HBox(15);
         topBar.getStyleClass().add("top-navbar");
         topBar.setAlignment(Pos.CENTER_LEFT);
@@ -176,7 +168,6 @@ public class ViewNavigator {
 
         topBar.getChildren().addAll(titleBox, spacer, userBox);
 
-        // 2. Sub-navigation tabs
         HBox subNav = new HBox(8);
         subNav.getStyleClass().add("sub-navbar");
 

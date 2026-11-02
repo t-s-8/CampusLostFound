@@ -5,9 +5,6 @@ import com.campuslostfound.exception.InvalidMatchException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-/**
- * Represents a similarity match between a LOST item and a FOUND item.
- */
 public class Match {
 
     public static final double MATCH_THRESHOLD = 70.0;
@@ -19,23 +16,14 @@ public class Match {
     private MatchStatus status;
     private LocalDateTime createdAt;
 
-    /**
-     * Overloaded constructor for newly generated matches without ID.
-     */
     public Match(int lostItemId, int foundItemId, double score) {
         this(0, lostItemId, foundItemId, score, MatchStatus.PENDING, LocalDateTime.now());
     }
 
-    /**
-     * Overloaded constructor for newly generated matches with specific status.
-     */
     public Match(int lostItemId, int foundItemId, double score, MatchStatus status, LocalDateTime createdAt) {
         this(0, lostItemId, foundItemId, score, status, createdAt);
     }
 
-    /**
-     * Full constructor for matches loaded from database or with specific status.
-     */
     public Match(int matchId, int lostItemId, int foundItemId, double score,
                  MatchStatus status, LocalDateTime createdAt) {
         setMatchId(matchId);
@@ -105,10 +93,6 @@ public class Match {
         return createdAt;
     }
 
-    /**
-     * Determines if this match score meets the threshold for a possible match (>= 70.0).
-     * NOTE: A possible match NEVER automatically marks an item recovered.
-     */
     public boolean isPossibleMatch() {
         return this.score >= MATCH_THRESHOLD;
     }

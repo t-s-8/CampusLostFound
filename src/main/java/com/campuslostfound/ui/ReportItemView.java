@@ -21,10 +21,6 @@ import javafx.util.StringConverter;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Screen 4: Report Item View
- * Submits LOST or FOUND reports to ItemService, validating input and kicking off automated matching.
- */
 public class ReportItemView {
 
     private final VBox root;
@@ -44,7 +40,6 @@ public class ReportItemView {
         Label subLbl = new Label("Fill in the item details accurately to increase the probability of matching.");
         subLbl.setStyle("-fx-text-fill: #64748b; -fx-font-size: 12px;");
 
-        // Type selection toggle
         Label typeLbl = new Label("What are you reporting?");
         typeLbl.getStyleClass().add("form-label");
 
@@ -58,13 +53,11 @@ public class ReportItemView {
 
         HBox typeBox = new HBox(20, lostRadio, foundRadio);
 
-        // Name
         Label nameLbl = new Label("Item Title / Name *");
         nameLbl.getStyleClass().add("form-label");
         TextField nameField = new TextField();
         nameField.setPromptText("e.g. Dell XPS 15 Charger, Hydro Flask Bottle, Student ID Card");
 
-        // Category
         Label catLbl = new Label("Category *");
         catLbl.getStyleClass().add("form-label");
         ComboBox<String> catCombo = new ComboBox<>(FXCollections.observableArrayList(
@@ -74,7 +67,6 @@ public class ReportItemView {
         catCombo.setValue("Electronics");
         catCombo.setMaxWidth(Double.MAX_VALUE);
 
-        // Location
         Label locLbl = new Label("Campus Location *");
         locLbl.getStyleClass().add("form-label");
         ComboBox<Location> locCombo = new ComboBox<>();
@@ -96,25 +88,21 @@ public class ReportItemView {
             }
         });
 
-        // Date
         Label dateLbl = new Label("Date (Lost or Found) *");
         dateLbl.getStyleClass().add("form-label");
         DatePicker datePicker = new DatePicker(LocalDate.now());
         datePicker.setMaxWidth(Double.MAX_VALUE);
 
-        // Description
         Label descLbl = new Label("Description & Identifying Marks");
         descLbl.getStyleClass().add("form-label");
         TextArea descArea = new TextArea();
         descArea.setPromptText("Detail color, brand, stickers, unique scratches, contents, or circumstances...");
         descArea.setPrefRowCount(3);
 
-        // Status messages
         Label feedbackLbl = new Label();
         feedbackLbl.setWrapText(true);
         feedbackLbl.setVisible(false);
 
-        // Submit button
         Button submitBtn = new Button("Submit Report");
         submitBtn.getStyleClass().add("btn-primary");
         submitBtn.setPrefWidth(160);
@@ -172,7 +160,6 @@ public class ReportItemView {
                 feedbackLbl.getStyleClass().setAll("success-label");
                 feedbackLbl.setVisible(true);
 
-                // Clear input fields
                 nameField.clear();
                 descArea.clear();
             } catch (Exception ex) {

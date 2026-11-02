@@ -5,9 +5,6 @@ import com.campuslostfound.exception.InvalidClaimException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-/**
- * Represents a student's formal ownership claim on a found item.
- */
 public class Claim {
 
     private int claimId;
@@ -19,16 +16,10 @@ public class Claim {
     private Integer reviewedBy;
     private LocalDateTime reviewedAt;
 
-    /**
-     * Overloaded constructor for submitting a new claim.
-     */
     public Claim(int itemId, int userId, String verificationDetails) {
         this(0, itemId, userId, LocalDateTime.now(), ClaimStatus.PENDING, verificationDetails, null, null);
     }
 
-    /**
-     * Full constructor for instantiating claims from database.
-     */
     public Claim(int claimId, int itemId, int userId, LocalDateTime claimDate,
                  ClaimStatus status, String verificationDetails, Integer reviewedBy, LocalDateTime reviewedAt) {
         setClaimId(claimId);
@@ -109,9 +100,6 @@ public class Claim {
         return this.status == ClaimStatus.PENDING;
     }
 
-    /**
-     * Approves the claim by an administrator.
-     */
     public void approve(int adminUserId) {
         if (adminUserId <= 0) {
             throw new InvalidClaimException("A valid reviewer admin ID is required to approve a claim.");
@@ -121,9 +109,6 @@ public class Claim {
         this.reviewedAt = LocalDateTime.now();
     }
 
-    /**
-     * Rejects the claim by an administrator.
-     */
     public void reject(int adminUserId) {
         if (adminUserId <= 0) {
             throw new InvalidClaimException("A valid reviewer admin ID is required to reject a claim.");

@@ -92,27 +92,21 @@ class MatchAlgorithmTest {
         LocalDate baseDate = LocalDate.of(2026, 10, 10);
         Item lost = new LostItem(1, 10, 1, "Item", "Cat", "Desc", baseDate);
 
-        // Same day (0 days) -> 20.0
         Item found0Days = new FoundItem(2, 20, 1, "Item", "Cat", "Desc", baseDate);
         assertEquals(20.0, algorithm.calculateDateScore(lost, found0Days));
 
-        // 1 to 2 days -> 16.0
         Item found2Days = new FoundItem(3, 20, 1, "Item", "Cat", "Desc", baseDate.plusDays(2));
         assertEquals(16.0, algorithm.calculateDateScore(lost, found2Days));
 
-        // 3 to 5 days -> 12.0
         Item found4Days = new FoundItem(4, 20, 1, "Item", "Cat", "Desc", baseDate.plusDays(4));
         assertEquals(12.0, algorithm.calculateDateScore(lost, found4Days));
 
-        // 6 to 7 days -> 8.0
         Item found7Days = new FoundItem(5, 20, 1, "Item", "Cat", "Desc", baseDate.plusDays(7));
         assertEquals(8.0, algorithm.calculateDateScore(lost, found7Days));
 
-        // 8 to 14 days -> 4.0
         Item found10Days = new FoundItem(6, 20, 1, "Item", "Cat", "Desc", baseDate.plusDays(10));
         assertEquals(4.0, algorithm.calculateDateScore(lost, found10Days));
 
-        // > 14 days -> 0.0
         Item found30Days = new FoundItem(7, 20, 1, "Item", "Cat", "Desc", baseDate.plusDays(30));
         assertEquals(0.0, algorithm.calculateDateScore(lost, found30Days));
     }
@@ -123,14 +117,11 @@ class MatchAlgorithmTest {
         Item lost = new LostItem(1, 10, 1, "Apple MacBook Pro Charger", "Electronics", null, LocalDate.now());
         Item found = new FoundItem(2, 20, 1, "Apple Charger 85W MacBook", "Electronics", "", LocalDate.now());
 
-        // Name shares "apple", "macbook", "charger"
         double nameScore = algorithm.calculateNameScore(lost, found);
         assertTrue(nameScore > 10.0, "Substantial token overlap should give high name score");
 
-        // Null/empty descriptions safely return 0.0 without NullPointerException
         assertEquals(0.0, algorithm.calculateDescriptionScore(lost, found));
 
-        // Both populated descriptions with partial overlap
         lost.setDescription("White rectangular power brick with MagSafe 3 cable");
         found.setDescription("White MagSafe charger found in study room");
         double descScore = algorithm.calculateDescriptionScore(lost, found);
@@ -141,21 +132,13 @@ class MatchAlgorithmTest {
     @DisplayName("Realistic possible match exceeds 70.0 threshold")
     void testPossibleMatchThreshold() {
         LocalDate date = LocalDate.of(2026, 10, 12);
-        // Lost Dell charger in Auditorium
         Item lost = new LostItem(1, 10, 3, "Dell 65W USB-C Laptop Charger", "Electronics",
                 "Black oval AC adapter with USB-C connector", date);
 
-        // Found Dell adapter in Auditorium, same day
         Item found = new FoundItem(2, 20, 3, "Dell Laptop Power Adapter", "Electronics",
                 "Black Dell USB-C adapter found plugged into socket", date);
 
         Match match = algorithm.compare(lost, found);
-        // Category match: 25
-        // Location match: 25
-        // Date match: 20
-        // Name overlap: ~10
-        // Desc overlap: ~3
-        // Total: ~83
         assertTrue(match.getScore() >= 70.0, "Expected score >= 70, got: " + match.getScore());
         assertTrue(match.isPossibleMatch());
     }
@@ -184,13 +167,10 @@ class MatchAlgorithmTest {
         Item found1 = new FoundItem(3, 20, 1, "Keys", "Keys", "Keys", date);
         Item sameAsLost1 = new FoundItem(1, 20, 1, "Keys", "Keys", "Keys", date);
 
-        // Rule 1: Same item ID comparison
         assertThrows(InvalidMatchException.class, () -> algorithm.compare(lost1, sameAsLost1));
 
-        // Rule 2: Comparing two LOST items
         assertThrows(InvalidMatchException.class, () -> algorithm.compare(lost1, lost2));
 
-        // Rule 3: Null item comparison
         assertThrows(InvalidMatchException.class, () -> algorithm.compare(lost1, null));
         assertThrows(InvalidMatchException.class, () -> algorithm.compare(null, found1));
     }

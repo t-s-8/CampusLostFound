@@ -1,10 +1,7 @@
-# Compiled class files
 *.class
 
-# Log files
 *.log
 
-# Package files
 *.jar
 *.war
 *.nar
@@ -13,7 +10,6 @@
 *.tar.gz
 *.rar
 
-# Maven target directory
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -21,12 +17,10 @@ pom.xml.versionsBackup
 pom.xml.next
 release.properties
 
-# Database and environment credentials (NEVER COMMIT CREDENTIALS)
 db.properties
 *.local.properties
 application-local.properties
 
-# IDE specific files
 .idea/
 *.iml
 *.iws
@@ -36,6 +30,5 @@ application-local.properties
 .settings/
 .vscode/
 
-# OS specific files
 .DS_Store
 Thumbs.db

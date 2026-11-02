@@ -38,7 +38,6 @@ class ClaimServiceTest {
     private User studentClaimant;
     private User adminUser;
 
-    // In-memory test doubles
     private static class InMemoryItemDAO extends ItemDAO {
         private final Map<Integer, Item> map = new HashMap<>();
 
@@ -245,7 +244,6 @@ class ClaimServiceTest {
     void testNonAdminCannotReviewClaims() {
         Claim claim = claimService.submitClaim(10, 2, "Valid proof");
 
-        // studentFinder (user ID 1) is not an Admin
         assertThrows(InvalidClaimException.class, () ->
                 claimService.approveClaim(claim.getClaimId(), 1)
         );

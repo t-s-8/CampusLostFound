@@ -2,10 +2,6 @@ package com.campuslostfound.model;
 
 import java.util.List;
 
-/**
- * Data Transfer Object (DTO) encapsulating aggregated system analytics and KPI metrics
- * computed directly from the MySQL database.
- */
 public class AdminAnalytics {
 
     private final long totalLostItems;
@@ -19,14 +15,8 @@ public class AdminAnalytics {
     private final List<LocationStat> topLocations;
     private final List<CategoryStat> topCategories;
 
-    /**
-     * Immutable projection of campus incident count by location.
-     */
     public record LocationStat(String locationName, String building, int totalReports, int lostCount, int foundCount) {}
 
-    /**
-     * Immutable projection of campus incident count by item category.
-     */
     public record CategoryStat(String category, int totalReports, int lostCount, int foundCount) {}
 
     public AdminAnalytics(long totalLostItems, long totalFoundItems, long activeReports,

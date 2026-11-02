@@ -1,16 +1,9 @@
-/* ==========================================================================
-   Campus Lost & Found - Modern JavaFX Stylesheet
-   ========================================================================== */
-
 .root {
     -fx-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -fx-font-size: 13px;
     -fx-background-color: #f1f5f9;
 }
 
-/* --------------------------------------------------------------------------
-   Header & Navigation
-   -------------------------------------------------------------------------- */
 .top-navbar {
     -fx-background-color: #0f172a;
     -fx-padding: 12px 24px;
@@ -89,9 +82,6 @@
     -fx-border-radius: 6px;
 }
 
-/* --------------------------------------------------------------------------
-   Cards and Panels
-   -------------------------------------------------------------------------- */
 .content-container {
     -fx-padding: 24px;
 }
@@ -133,9 +123,6 @@
     -fx-font-weight: bold;
 }
 
-/* --------------------------------------------------------------------------
-   Buttons
-   -------------------------------------------------------------------------- */
 .btn-primary {
     -fx-background-color: #2563eb;
     -fx-text-fill: #ffffff;
@@ -203,9 +190,6 @@
     -fx-background-color: #475569;
 }
 
-/* --------------------------------------------------------------------------
-   Inputs and Forms
-   -------------------------------------------------------------------------- */
 .text-field, .password-field, .combo-box, .date-picker {
     -fx-background-color: #ffffff;
     -fx-border-color: #cbd5e1;
@@ -246,9 +230,6 @@
     -fx-font-weight: bold;
 }
 
-/* --------------------------------------------------------------------------
-   Tables
-   -------------------------------------------------------------------------- */
 .table-view {
     -fx-background-color: #ffffff;
     -fx-border-color: #e2e8f0;
@@ -282,9 +263,6 @@
     -fx-text-fill: #1e1b4b;
 }
 
-/* --------------------------------------------------------------------------
-   Status Badges (Pills)
-   -------------------------------------------------------------------------- */
 .badge-active {
     -fx-background-color: #dbeafe;
     -fx-text-fill: #1e40af;

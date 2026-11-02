@@ -16,14 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Data Access Object (DAO) for candidate match persistence.
- */
 public class MatchDAO {
 
-    /**
-     * Inserts a new match record or updates the score/status if the pair already exists (upsert).
-     */
     public Match create(Match match) {
         String sql = "INSERT INTO matches (lost_item_id, found_item_id, score, status, created_at) " +
                 "VALUES (?, ?, ?, ?, ?) " +
@@ -50,9 +44,6 @@ public class MatchDAO {
         }
     }
 
-    /**
-     * Finds an existing match for a specific lost and found pair.
-     */
     public Optional<Match> findByLostAndFound(int lostItemId, int foundItemId) {
         String sql = "SELECT match_id, lost_item_id, found_item_id, score, status, created_at " +
                 "FROM matches WHERE lost_item_id = ? AND found_item_id = ?";
@@ -72,27 +63,18 @@ public class MatchDAO {
         }
     }
 
-    /**
-     * Retrieves all candidate matches for a lost item ordered by score descending.
-     */
     public List<Match> findByLostItemId(int lostItemId) {
         String sql = "SELECT match_id, lost_item_id, found_item_id, score, status, created_at " +
                 "FROM matches WHERE lost_item_id = ? ORDER BY score DESC";
         return queryMatches(sql, lostItemId);
     }
 
-    /**
-     * Retrieves all candidate matches for a found item ordered by score descending.
-     */
     public List<Match> findByFoundItemId(int foundItemId) {
         String sql = "SELECT match_id, lost_item_id, found_item_id, score, status, created_at " +
                 "FROM matches WHERE found_item_id = ? ORDER BY score DESC";
         return queryMatches(sql, foundItemId);
     }
 
-    /**
-     * Retrieves all matches in the database ordered by score descending.
-     */
     public List<Match> findAll() {
         String sql = "SELECT match_id, lost_item_id, found_item_id, score, status, created_at " +
                 "FROM matches ORDER BY score DESC";
@@ -110,9 +92,6 @@ public class MatchDAO {
         }
     }
 
-    /**
-     * Updates the status of a match (e.g. PENDING -> NOTIFIED -> CONFIRMED -> DISMISSED).
-     */
     public boolean updateStatus(int matchId, MatchStatus status) {
         String sql = "UPDATE matches SET status = ? WHERE match_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
